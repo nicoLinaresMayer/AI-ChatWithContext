@@ -1,0 +1,20 @@
+<template>
+    <lightning-card>
+        <div class="slds-m-top_medium slds-m-bottom_x-large">
+            <h2 class="slds-text-heading_medium slds-m-bottom_medium">
+                A text input field with placeholder text.
+            </h2>
+    
+            <!-- Default/basic -->
+            <div class="slds-p-around_medium lgc-bg">
+                <lightning-input type="text" label="Enter some text" placeholder="type your prompt here" onchange={handleInputChange}></lightning-input>
+            </div>
+            <lightning-button label="Send Prompt" onclick={handleButtonClick}></lightning-button>
+        </div>
+    
+        <p>
+            {response}
+        </p>
+    </lightning-card>
+  
+</template>
