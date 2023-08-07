@@ -6,20 +6,18 @@ public with sharing class SessionService {
 
 
         for(Prompt__c prompt : prompts){
-            messagesList.add( '{"role": "user", "content": "'+prompt.Content__c+'"}');
-            messagesList.add( '{"role": "system", "content": "'+prompt.Response__c+'"}');
+
+            String content= PromptService.parsePrompt(prompt.Content__c);
+            String response = PromptService.parsePrompt(prompt.Response__c);
+            messagesList.add( '{"role": "user", "content": "'+content+'"}');
+            messagesList.add( '{"role": "system", "content": "'+response+'"}');
 
         }
         return messagesList;
 
-        
-   //messagesList.add( '{"role": "user", "content": "puedes decirmelo ahora en italiano"}');
     }
 
-    /*public static void incrementSessionLastIndex(Session__c session){
-        session.LastPromptIndex__c++;
-        update session;
-    }*/
+
 
     public static Session__c getSession(Id sessionId){
         Session__c session = [SELECT Id,LastPromptIndex__c FROM Session__c];

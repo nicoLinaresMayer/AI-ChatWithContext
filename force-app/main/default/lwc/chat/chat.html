@@ -9,16 +9,19 @@
                 <ul class="message-list">
                     <template for:each={messages} for:item="message">
                         <li key={message.Id} class="message-item">
-                            <lightning-textarea name="input4" readonly value={message.content} label={message.role}></lightning-textarea>
+                            <lightning-textarea max-length="500" name="input4" readonly value={message.content} label={message.role}></lightning-textarea>
                         </li>
                     </template>
                 </ul>
             </template>
             <!-- Default/basi c -->
             <div class="slds-p-around_medium lgc-bg">
-                <lightning-input type="text" value ={prompt} label="Enter your prompt" placeholder="" onchange={handleInputChange}></lightning-input>
+                <lightning-textarea type="text" value ={prompt} label="Enter your prompt" placeholder="" onchange={handleInputChange}></lightning-textarea>
             </div>
             <lightning-button label="Send Prompt" onclick={handleButtonClick}></lightning-button>
+            <p>
+                {response}
+            </p>
         </div>
     
     </lightning-card>
