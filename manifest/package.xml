@@ -42,7 +42,15 @@
 	</types>
 	<types>
 		<members>*</members>
+		<name>Flow</name>
+	</types>
+	<types>
+		<members>*</members>
 		<name>LightningComponentBundle</name>
+	</types>
+	<types>
+		<members>Session__c.Delete_chat</members>
+		<name>QuickAction</name>
 	</types>
 	<types>
 		<members>*</members>
