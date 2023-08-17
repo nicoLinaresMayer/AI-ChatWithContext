@@ -1,12 +1,14 @@
 import { LightningElement,api,wire } from 'lwc';
-import sendPrompt from '@salesforce/apex/ChatController.sendPrompt';
-import retrieveChatMessages from '@salesforce/apex/ChatController.retrieveChatMessages'
+import getChatCompletion from '@salesforce/apex/ChatController.getChatCompletion';
+import retrieveChatMessages from '@salesforce/apex/ChatController.retrieveChat'
 
 export default class Chat extends LightningElement {
     @api recordId;
     prompt = '';
     response = '';
     messages = [];
+    temperature = 0.8;
+    val = 50;
     handleInputChange(event) {
         this.prompt = event.target.value;
     }
@@ -15,15 +17,8 @@ export default class Chat extends LightningElement {
     wiredRetrieveChatMessages({error,data}){
         try{
             if (data) {
-                let index = 1;
-    
-                this.messages = data.map(element=>{
-                    let object = JSON.parse(element);
-                    object['Id'] = index;
-                    index++;
-                    return object;
-                });
-                console.log(JSON.parse(JSON.stringify(this.messages)));
+                console.log(data);
+                this.messages = data;
             } else if (error) {
                 console.error(error);
                 console.log('error-->'+error);
@@ -38,20 +33,21 @@ export default class Chat extends LightningElement {
     handleButtonClick(){
         this.response = 'Waiting for response...';
         console.log(this.prompt);
-        sendPrompt({ prompt: this.prompt ,sessionId : this.recordId})
+        getChatCompletion({ prompt: this.prompt ,sessionId : this.recordId, temperature : this.temperatureValue})
         .then(result => {
-            // Aquí puedes manejar el resultado del método de Apex
             console.log('Resultado de Apex:', result);
             if(result!= ''){
-                let newMessages = [{role:"user",content:this.prompt, Id : 123},{role: "system" , content: result, Id : 1234}];
+                let newPrompt = {Id : 123 , Content:this.prompt, Response : result};
+           
                 this.response = '';
-                this.messages = [...this.messages, newMessages[0],newMessages[1]];
+                this.messages = [...this.messages, newPrompt];
                 this.prompt = '';
             }
             else{
                 this.response = 'Error'
             }
             
+            this.updateScroll();
             
         })
         .catch(error => {
@@ -60,5 +56,11 @@ export default class Chat extends LightningElement {
         });
     }  
     
-
+    updateScroll(){
+        let element = document.getElementsByClassName("chat-container");
+        element.scrollTop = element.scrollHeight;
+    }
+    handleSliderChange(event){
+        this.temperatureValue = event.target.value;
+    }
 }

@@ -1,12 +1,12 @@
 public with sharing class ChatController {
     @AuraEnabled
-    public static String sendPrompt(String prompt, Id sessionId){
-        return PromptService.addPromptToChat(prompt,sessionId);
+    public static String getChatCompletion(String prompt, Id sessionId,Decimal temperature){
+        return PromptService.getChatCompletion(prompt,sessionId,temperature);
     }
 
     @AuraEnabled(cacheable=true)
-    public static List<String> retrieveChatMessages(Id sessionId){
-        return SessionService.retrieveChatMessages(sessionId);
+    public static List<SessionService.PromptWrapper> retrieveChat(Id sessionId){
+        return SessionService.retrieveChat(sessionId);
     }
 
 
