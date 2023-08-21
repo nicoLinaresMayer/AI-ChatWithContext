@@ -7,7 +7,10 @@ public with sharing class PromptService {
         req.setMethod(method);
         req.setHeader('Authorization','Bearer '+ accessToken);
         req.setHeader('Content-Type', 'application/json; charset=UTF-8');
-        req.setBody(body);
+        if(body!=''){
+            req.setBody(body);
+        }
+        
         req.setTimeout(120000);
 
         Http http = new Http();
