@@ -33,12 +33,11 @@ public with sharing class ModelService {
         return datasetFileId;
     }
     
-
     //POST https://api.openai.com/v1/fine-tunes
     public static String createFineTune(String datasetId, String baseModel){
         String endpoint = 'https://api.openai.com/v1/fine-tunes';
         String method = 'POST';
-        String body = '{"training_file:"'+datasetId+'" , "model":"'+baseModel+'"}';
+        String body = '{"training_file":"'+datasetId+'" , "model":"'+baseModel+'"}';
         system.debug(body);
         Http http = new Http();
         HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);

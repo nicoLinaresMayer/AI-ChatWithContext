@@ -43,8 +43,7 @@ public with sharing class PromptService {
             Map<String,Object> responseBody = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
             List<Object> choicesList = (List<Object>) responseBody.get('choices');
             Map<String, Object> firstChoice = (Map<String, Object>) choicesList[0];
-            Object responseContent2 = firstChoice.get('text');
-            system.debug(responseContent2);
+            responseContent = (String) firstChoice.get('text');
         } 
         else {
                 System.debug('Callout fail. Error code : ' + res.getStatusCode());
@@ -100,7 +99,7 @@ public with sharing class PromptService {
         String method = 'POST';
         String accessToken = ACCESS_TOKEN;
 
-        String body = '{"model": "'+model+'","prompt": "'+parsePrompt(prompt)+'","max_tokens": 2000,"temperature": '+temperature+'}';
+        String body = '{"model": "'+model+'","prompt": "'+parsePrompt(prompt)+'","max_tokens": 1500,"temperature": '+temperature+', "stop":"###"}';
         HttpResponse res = apiCaller(endpoint, body, method, accessToken);
         String singleCompletion = handleSingleCompletionResponse(res);
 

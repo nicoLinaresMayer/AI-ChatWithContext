@@ -10,4 +10,10 @@ public with sharing class ChatController {
     }
 
 
+    //Single completion
+    @AuraEnabled
+    public static String getSingleCompletion(String prompt,Decimal temperature, String model){
+        return PromptService.getSingleCompletion(prompt,temperature,model);
+    }
+
 }
