@@ -10,10 +10,9 @@ public with sharing class ChatController {
     }
 
 
-    //Single completion
-    @AuraEnabled
+    //Single completion -- Deprecated by 3.5gpt-turbo fine-tuning
+    /*@AuraEnabled
     public static String getSingleCompletion(String prompt,Decimal temperature, String model){
         return PromptService.getSingleCompletion(prompt,temperature,model);
-    }
-
+    }*/
 }

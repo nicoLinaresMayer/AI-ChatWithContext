@@ -17,10 +17,8 @@ export default class Chat extends LightningElement {
     wiredRetrieveChatMessages({error,data}){
         try{
             if (data) {
-                console.log(data);
                 this.messages = data;
             } else if (error) {
-                console.error(error);
                 console.log('error-->'+error);
             }
         }
@@ -38,7 +36,6 @@ export default class Chat extends LightningElement {
             console.log('Resultado de Apex:', result);
             if(result!= ''){
                 let newPrompt = {Id : 123 , Content:this.prompt, Response : result};
-           
                 this.response = '';
                 this.messages = [...this.messages, newPrompt];
                 this.prompt = '';

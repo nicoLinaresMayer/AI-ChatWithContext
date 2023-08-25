@@ -1,0 +1,53 @@
+<template>
+        <div class="slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none modalBodyy">
+             <template if:true={isLoading}>
+                <lightning-spinner alternative-text="Loading" size="medium" class="spinnerClass"></lightning-spinner>
+             </template>
+             <lightning-card>
+                 <lightning-button label="Add Row" slot="actions" icon-name="utility:add" onclick={addRow}></lightning-button>
+                <div class="slds-m-around_medium">
+                    <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+                        <thead>
+                            <tr class="slds-line-height_reset">
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="User Prompt">User Prompt</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="System Expected Response">System Expected Response</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Assistant Response">Assistant Response</div>
+                                </th>
+                                <th class="" scope="col">
+                                    <div class="slds-truncate" title="Stage">Action</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template for:each={rows} for:item="obj">
+                                <tr class="inputRows" key={obj.Id}>
+                                    <th data-label="User prompt" scope="row">
+                                        <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={obj.User} onchange={handleChange}></lightning-textarea>
+                                    </th>
+                                    <td data-label="System Expected Response">
+                                        <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={obj.System} onchange={handleChange}></lightning-textarea>
+                                    </td>
+                                    <td data-label="Assistant Response">
+                                        <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={obj.Assistant} onchange={handleChange}></lightning-textarea>
+                                    </td>
+                                    <td data-label="Delete row">
+                                        <lightning-button-icon icon-name="action:delete"  alternative-text="Delete" title="Delete" data-id={obj.Id} onclick={deleteRow}></lightning-button-icon>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                    <div class="slds-align_absolute-center">
+                        <lightning-button variant="neutral" label="Cancel" onclick={closeAction}></lightning-button> &nbsp;
+                        <lightning-button variant="brand" label="Save" onclick={handleSaveAction} disabled={isDisable}></lightning-button>
+                    </div>
+                  
+                </div>
+            </lightning-card>
+        </div>
+</template>

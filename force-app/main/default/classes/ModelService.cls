@@ -107,7 +107,7 @@ public with sharing class ModelService {
     }
     
     //GET https://api.openai.com/v1/fine-tunes/{fine_tune_id}/events
-    //Here we get job status messages to view if model's training finished.
+    //Here we get job status messages to view if model's training is finished.
     public static List<String> getFineTuneJobEventMessages(String fineTuneId){
         String endpoint = 'https://api.openai.com/v1/fine-tunes/'+fineTuneId+'/events';
         String method = 'GET';

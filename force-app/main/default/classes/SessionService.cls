@@ -1,7 +1,7 @@
 public with sharing class SessionService {
     public static List<Prompt__c> retrieveSessionPrompts(Id sessionId){
 
-        List<Prompt__c> prompts = [SELECT Id, Content__c, Response__c, Order__c FROM Prompt__c WHERE Session__c =:sessionId ORDER BY Order__c ASC];
+        List<Prompt__c> prompts = [SELECT Id, Content__c, Response__c, Order__c FROM Prompt__c WHERE Session__c =:sessionId AND Type__c = 'Default' ORDER BY Order__c ASC];
         return prompts;
 
     }
@@ -43,7 +43,26 @@ public with sharing class SessionService {
     public static void addPromptToSession(String prompt, String sessionId){
 
     }
+    public List<Prompt__c> retrieveContextPrompts(Id sessionId){
+        List<Prompt__c> prompts = [SELECT Id, Content__c, Response__c, Order__c FROM Prompt__c WHERE Session__c =:sessionId AND Type__c = 'Context' ORDER BY Order__c ASC];
+        return prompts;
+    }
 
+    public static List<PromptWrapper> retrieveContextMessages(Id sessionId){
+        List<Prompt__c> prompts = retrieveContextPrompts(sessionId);
+        List<PromptWrapper> wrappedPrompts  = new List<PromptWrapper>();
+        
+        for (Prompt__c prompt : prompts) {
+            wrappedPrompts.add(new PromptWrapper(
+                prompt.Id,
+                prompt.Content__c,
+                prompt.Response__c,
+                Integer.valueOf(prompt.Order__c) 
+            ));
+        }
+        
+        return wrappedPrompts;
+    }
     public static Session__c getSession(Id sessionId){
         Session__c session = [SELECT Id,LastPromptIndex__c FROM Session__c];
         return session;

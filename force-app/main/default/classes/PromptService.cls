@@ -57,6 +57,10 @@ public with sharing class PromptService {
         incomingPrompt = parsePrompt(incomingPrompt);
         List<Prompt__c> promptList = SessionService.retrieveSessionPrompts(sessionId);
         List<String> messagesList = new List<String>();
+        List<Prompt__c> contextPrompts = SessionService.retrieveContextPrompts(SessionId); 
+        for (Prompt__c prompt : contextPrompts) {
+            messagesList.add('{"role": "system", "content": "'+parsePrompt(prompt.Content__c)+'"}');
+        }
         for (Prompt__c prompt : promptList) {
             messagesList.add('{"role": "user", "content": "'+parsePrompt(prompt.Content__c)+'"}');
             messagesList.add('{"role": "system", "content": "'+parsePrompt(prompt.response__c)+'"}');
@@ -94,7 +98,8 @@ public with sharing class PromptService {
         return chatCompletion;
     }
 
-    public static String getSingleCompletion(String prompt,Decimal temperature,String model){
+    //Deprecated by 3.5gpt-turbo fine-tuning
+    /*public static String getSingleCompletion(String prompt,Decimal temperature,String model){
         String endpoint = 'https://api.openai.com/v1/completions';
         String method = 'POST';
         String accessToken = ACCESS_TOKEN;
@@ -104,7 +109,7 @@ public with sharing class PromptService {
         String singleCompletion = handleSingleCompletionResponse(res);
 
         return singleCompletion;
-    }
+    }*/
     public static String retrieveFineTunedModel(){
         HttpRequest req = new HttpRequest();
         req.setEndpoint('https://api.openai.com/v1/fine-tunes'); 
