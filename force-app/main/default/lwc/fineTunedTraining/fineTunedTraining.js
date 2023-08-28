@@ -1,8 +1,8 @@
 import { LightningElement } from 'lwc';
 
 const  COLUMNS = [
-    { label: 'User', fieldName: 'user', type : 'text',editable: true },
     { label: 'System', fieldName: 'system', editable: true },
+    { label: 'User', fieldName: 'user', type : 'text',editable: true },
     { label: 'Assistant', fieldName: 'assistant', editable: true }
 ];
 export default class FineTunedTraining extends LightningElement {

@@ -2,24 +2,26 @@ import { LightningElement,api,wire } from 'lwc';
 import getChatCompletion from '@salesforce/apex/ChatController.getChatCompletion';
 import retrieveChatMessages from '@salesforce/apex/ChatController.retrieveChat'
 
+
 export default class Chat extends LightningElement {
-    @api recordId;
+    @api sessionId;
     prompt = '';
     response = '';
     messages = [];
     temperature = 0.8;
+
     val = 50;
     handleInputChange(event) {
         this.prompt = event.target.value;
     }
 
-    @wire(retrieveChatMessages,{sessionId : '$recordId'})
-    wiredRetrieveChatMessages({error,data}){
+    @wire(retrieveChatMessages,{sessionId : '$sessionId'})
+    wiredChatMessages({error,data}){
         try{
             if (data) {
                 this.messages = data;
             } else if (error) {
-                console.log('error-->'+error);
+                console.log('Error in wiredChatMessages->'+error);
             }
         }
         catch(error){
@@ -28,14 +30,15 @@ export default class Chat extends LightningElement {
         
     }
 
+
     handleButtonClick(){
         this.response = 'Waiting for response...';
         console.log(this.prompt);
-        getChatCompletion({ prompt: this.prompt ,sessionId : this.recordId, temperature : this.temperatureValue})
+        getChatCompletion({ prompt: this.prompt,sessionId : this.sessionId, temperature : this.temperatureValue})
         .then(result => {
             console.log('Resultado de Apex:', result);
             if(result!= ''){
-                let newPrompt = {Id : 123 , Content:this.prompt, Response : result};
+                let newPrompt = {Id : 123 , Content:this.prompt, Response : result, Type : 'Default'};
                 this.response = '';
                 this.messages = [...this.messages, newPrompt];
                 this.prompt = '';

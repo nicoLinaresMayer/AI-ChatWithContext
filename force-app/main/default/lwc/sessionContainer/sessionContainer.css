@@ -1,0 +1,12 @@
+.container{
+    display:flex;
+}
+
+.chat-context {
+    flex: 1; /* El primer componente tomará el espacio disponible */
+    margin-right: 10px; /* Agregar margen derecho para separación */
+}
+
+.chat {
+    flex: 2; /* El segundo componente ocupará el doble de espacio */
+}

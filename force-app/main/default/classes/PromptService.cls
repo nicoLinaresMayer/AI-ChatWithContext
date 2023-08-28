@@ -36,7 +36,8 @@ public with sharing class PromptService {
         
        return responseContent;     
     }
-    public static String handleSingleCompletionResponse(HttpResponse res){
+    //Deprecated by 3.5gpt-turbo fine-tuning 
+    /*public static String handleSingleCompletionResponse(HttpResponse res){
         String responseContent = '';
         if (res.getStatusCode() == 200) {
             system.debug(res.getBody());
@@ -51,17 +52,18 @@ public with sharing class PromptService {
             }
         
        return responseContent;     
-    }
+    }*/
 
     public static String getRequestBodyWithNewPrompt(String incomingPrompt,Id sessionId, String model,Decimal temperature){
         incomingPrompt = parsePrompt(incomingPrompt);
-        List<Prompt__c> promptList = SessionService.retrieveSessionPrompts(sessionId);
+        List<Prompt__c> promptsList = SessionService.retrieveSessionPrompts(sessionId);
+        List<Prompt__c> contextPromptsList = SessionService.retrieveContextPrompts(sessionId);
+        system.debug(contextPromptsList);
         List<String> messagesList = new List<String>();
-        List<Prompt__c> contextPrompts = SessionService.retrieveContextPrompts(SessionId); 
-        for (Prompt__c prompt : contextPrompts) {
+        for (Prompt__c prompt : contextPromptsList) {
             messagesList.add('{"role": "system", "content": "'+parsePrompt(prompt.Content__c)+'"}');
         }
-        for (Prompt__c prompt : promptList) {
+        for (Prompt__c prompt : promptsList) {
             messagesList.add('{"role": "user", "content": "'+parsePrompt(prompt.Content__c)+'"}');
             messagesList.add('{"role": "system", "content": "'+parsePrompt(prompt.response__c)+'"}');
         }
@@ -74,7 +76,7 @@ public with sharing class PromptService {
         return body;
     }
 
-    public static String getChatCompletion(String prompt,String sessionId,Decimal temperature){
+    public static String getChatCompletion(String prompt, String sessionId,Decimal temperature){
         //Prepare api call
         String model = 'gpt-3.5-turbo';
         String endpoint = 'https://api.openai.com/v1/chat/completions';
@@ -84,18 +86,18 @@ public with sharing class PromptService {
         String body = getRequestBodyWithNewPrompt(prompt,sessionId,model,temperature);
         //Make the call
         HttpResponse res = apiCaller(endpoint, body, method, accessToken);
-        String chatCompletion = handleChatCompletionResponse(res,sessionId);
+        String promptResponse = handleChatCompletionResponse(res,sessionId);
      
         //If condition meets, Create Prompt record and increase last index
-        if(chatCompletion != ''){
+        if(promptResponse != ''){
             Session__c session= SessionService.getSession(sessionId);
-            createPromptRecord(prompt, chatCompletion, sessionId, Integer.valueOf(session.LastPromptIndex__c));
+            insert new Prompt__c(Content__c = prompt , Response__c = promptResponse, Session__c = session.Id , Order__c = session.LastPromptIndex__c);
             session.LastPromptIndex__c++;
             update session;
         }
 
         
-        return chatCompletion;
+        return promptResponse;
     }
 
     //Deprecated by 3.5gpt-turbo fine-tuning
@@ -110,6 +112,7 @@ public with sharing class PromptService {
 
         return singleCompletion;
     }*/
+
     public static String retrieveFineTunedModel(){
         HttpRequest req = new HttpRequest();
         req.setEndpoint('https://api.openai.com/v1/fine-tunes'); 
@@ -150,9 +153,23 @@ public with sharing class PromptService {
         }
         return parsedPrompt;
     }
-    public static void createPromptRecord(String prompt, String response, Id sessionId, Integer LastPromptIndex){
-        insert new Prompt__c(Content__c = prompt, Response__c = response, Session__c = sessionId, Order__c = LastPromptIndex);
-    }
+    /*public static void upsertContextPrompts(List<String> contextPrompts, Id sessionId){
+        if(!contextPrompts.isEmpty()){
+            List<Prompt__c> contextPromptsFromQuery = [SELECT Content__c FROM Prompt__c WHERE Type__c = 'Context' AND Session__c =: sessionId];
+            List<String> contextPromptsContent = new List<String>();
+            List<Prompt__c> promptsToInsert = new List<Prompt__c>();
+            for(Prompt__c contextPrompt : contextPromptsFromQuery){
+                contextPromptsContent.add(contextPrompt.Content__c);
+            }
+            for(String prompt : contextPrompts){
+                if(!contextPromptsContent.contains(prompt)){
+                    promptsToInsert.add(new Prompt__c(Content__c = prompt, Response__c = '', Type__c = 'Context', Session__c = sessionId));
+                }
+            }
+            insert promptsToInsert;
+        }
+        
+    }*/
 
     class CustomException extends Exception{}
 }

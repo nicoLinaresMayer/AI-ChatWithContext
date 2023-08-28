@@ -10,11 +10,12 @@
                         <thead>
                             <tr class="slds-line-height_reset">
                                 <th class="" scope="col">
-                                    <div class="slds-truncate" title="User Prompt">User Prompt</div>
+                                    <div class="slds-truncate" title="System Context">System Context</div>
                                 </th>
                                 <th class="" scope="col">
-                                    <div class="slds-truncate" title="System Expected Response">System Expected Response</div>
+                                    <div class="slds-truncate" title="User Prompt">User Prompt</div>
                                 </th>
+                                
                                 <th class="" scope="col">
                                     <div class="slds-truncate" title="Assistant Response">Assistant Response</div>
                                 </th>
@@ -26,11 +27,12 @@
                         <tbody>
                             <template for:each={rows} for:item="obj">
                                 <tr class="inputRows" key={obj.Id}>
-                                    <th data-label="User prompt" scope="row">
-                                        <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={obj.User} onchange={handleChange}></lightning-textarea>
-                                    </th>
-                                    <td data-label="System Expected Response">
+                                    <th data-label="System Context" scope="row">
                                         <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={obj.System} onchange={handleChange}></lightning-textarea>
+                                    </th>
+                                    <td data-label="User Prompt">
+                                        <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={obj.User} onchange={handleChange}></lightning-textarea>
+                                       
                                     </td>
                                     <td data-label="Assistant Response">
                                         <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={obj.Assistant} onchange={handleChange}></lightning-textarea>

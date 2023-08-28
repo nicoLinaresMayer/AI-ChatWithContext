@@ -9,6 +9,17 @@ public with sharing class ChatController {
         return SessionService.retrieveChat(sessionId);
     }
 
+    @AuraEnabled(cacheable=true)
+    public static List<SessionService.PromptWrapper> retrieveContext(Id sessionId){
+        return SessionService.retrieveContextMessages(sessionId);
+    }
+
+    @AuraEnabled  
+    public static void saveContextPrompts(Id sessionId,List<String> contextPrompts){
+        SessionService.saveContextPrompts(sessionId,contextPrompts);
+    }
+
+
 
     //Single completion -- Deprecated by 3.5gpt-turbo fine-tuning
     /*@AuraEnabled
