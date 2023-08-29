@@ -3,9 +3,75 @@ public with sharing class ModelService {
 
 
     //POST https://api.openai.com/v1/files
-    public static void uploadDatasetFile(){
+    public static void uploadDatasetFile(String fileName,String jsonContent){
+        String accessToken = ACCESS_TOKEN;
+        String endpoint = ' https://api.openai.com/v1/files';
+        String message ='';
+
+        //{"messages": [{"role": "system", "content": "asd1"},{"role": "system", "content": "asd2"},{"role": "system", "content": "asd3"},{"role": "system", "content": "us"},{"role": "system", "content": "as"}]}
+        system.debug('jsonbefore'+jsonContent);
+
+        HttpRequest req = new HttpRequest();
+        req.setEndpoint(endpoint);
+        req.setMethod('POST');
+        req.setHeader('Authorization', 'Bearer ' + accessToken);
+        req.setHeader('Content-Type', 'multipart/form-data; boundary=boundary');
+
+        String boundary = 'boundary';
+        String body = '';
+        body += '--' + boundary + '\r\n';
+        body += 'Content-Disposition: form-data; name="purpose"\r\n\r\n';
+        body += 'fine-tune';
+        body += '\r\n';
+
+        body += '--' + boundary + '\r\n';
+        body += 'Content-Disposition: form-data; name="file"; filename="'+fileName+'"\r\n';
+        body += 'Content-Type: application/json\r\n\r\n';
+        //Acá contenido Jsonl
+        body += jsonContent;
+        body += '\r\n';
+
+        body += '--' + boundary + '--';
+
+        req.setBody(body);
+
+        Http http = new Http();
+        HttpResponse res = http.send(req);
+
+        if (res.getStatusCode() == 200) {
+            System.debug(res.getBody());
+        } else {
+            System.debug(res.getStatus());
+        }
     }
-    
+    public static String formatDatasetFile(List<String> rows){
+        //rows = new List<String>{'{"User":"Usercontent","System":"Context2\\nContext1","Assistant":"AssitantContent","Id":"row_wzwww"}'};
+        //rows.add('{"User":"userContent2","System":"Context3\\nContext4","Assistant":"assistantcontent2","Id":"row_wzwww"}');
+        
+        system.debug('firstrows'+ rows);
+        List<String> proccessedRows = new List<String>();
+        for(String row : rows){
+            //cada row es : {User: 'asdasd', System: 'Contexto linea 1\nContexto linea 2\ncontexto linea 3', Assistant: 'dasdas', Id: 'row_wzwww'}
+
+            Map<String, Object> rowMapped = (Map<String, Object>) JSON.deserializeUntyped(row);
+            List<String> systemLine = new List<String>();
+            for(String line : String.valueOf(rowMapped.get('System')).split('\n')){
+            systemLine.add('{"role": "system", "content": "'+line+'"}'); 
+            }
+            systemLine.add('{"role": "user", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('User')))+'"}');
+            systemLine.add('{"role": "assistant", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('Assistant')))+'"}');
+            String joinedString = String.join(systemLine,',');
+            String rowJson = '{"messages": ['+joinedString+']}';
+            proccessedRows.add(rowJson);
+        }
+       
+        String proccessedJson = String.join(proccessedRows,'\n');
+        proccessedJson+= '\n';
+        system.debug(proccessedJson);
+        return proccessedJson;
+        /*'{"messages": [{"role": "system", "content": "La empresa es Cloudgaia, tiene 400 empleados, mas de 600 certificaciones. Radica en San Isidro, EEUU y Reino Unido"},{"role":"user","content":"Cual es la empresa?"},{"role":"assistant","content":"Cloudgaia"}]}'*/
+
+    }
      //GET https://api.openai.com/v1/files
     public static String getDatasetIdByName(String fileName){
         String endpoint = 'https://api.openai.com/v1/files';
@@ -33,15 +99,16 @@ public with sharing class ModelService {
         return datasetFileId;
     }
     
-    //POST https://api.openai.com/v1/fine-tunes
-    public static String createFineTune(String datasetId, String baseModel){
-        String endpoint = 'https://api.openai.com/v1/fine-tunes';
+    //old POST https://api.openai.com/v1/fine-tunes
+    //new POST https://api.openai.com/v1/fine_tuning/jobs
+    public static String createFineTune(String datasetId, String baseModel, String suffixName){
+        String endpoint = 'https://api.openai.com/v1/fine_tuning/jobs';
         String method = 'POST';
-        String body = '{"training_file":"'+datasetId+'" , "model":"'+baseModel+'"}';
+        String body = '{"training_file":"'+datasetId+'" , "model":"'+baseModel+'" , "suffix":"'+suffixName+'"}';
         system.debug(body);
         Http http = new Http();
         HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
-
+        
         String fineTuneId = '';
 
         if(res.getStatusCode() == 200){
@@ -56,6 +123,18 @@ public with sharing class ModelService {
         return fineTuneId;
     }
 
+    public static void createModelRecord(String datasetId,String baseModel,String suffixName, String fineTuneId){
+        Model__c parentModel = new Model__c();
+        try{
+            parentModel = [SELECT Id FROM Model__c WHERE Name=:baseModel]; 
+        }
+        catch(Exception e){
+            parentModel = null;
+        }
+        if(fineTuneId !=''){
+           Database.insert(new Model__c(Name= suffixName,Model_Id__c = fineTuneId,parentModel__c = parentModel?.Id,Dataset_Id__c = datasetId));
+        }
+    }
     public static String getFineTuneId(String fineTuneName){
         String endpoint = 'https://api.openai.com/v1/fine-tunes';
         String method = 'GET';
@@ -83,7 +162,7 @@ public with sharing class ModelService {
     }
 
     public static List<String> listFineTunes (){
-        String endpoint = 'https://api.openai.com/v1/fine-tunes';
+        String endpoint = 'https://api.openai.com/v1/fine_tuning/jobs';
         String method = 'GET';
         String body = '';
         Http http = new Http();
@@ -105,11 +184,35 @@ public with sharing class ModelService {
         }
         return fineTunes;
     }
+    public static List<String> listDatasetFiles (){
+        String endpoint = 'https://api.openai.com/v1/files';
+        String method = 'GET';
+        String body = '';
+        Http http = new Http();
+        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+    
+        List<String> datasetFiles = new List<String>();
+        if(res.getStatusCode() == 200){
+            Map<String,Object> datasetProps = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
+            List<Object> datasetData= (List<Object>) datasetProps.get('data');
+            
+            for(Object obj  : datasetData){
+                Map<String,Object> objMap = (Map<String,Object>) obj;
+                datasetFiles.add((String)objMap.get('filename'));   
+                
+            }
+        }
+        else{
+            system.debug('Error: ' + res.getStatus() + ' --- Code: '+res.getStatusCode());
+        }
+        return datasetFiles;
+    }
     
     //GET https://api.openai.com/v1/fine-tunes/{fine_tune_id}/events
     //Here we get job status messages to view if model's training is finished.
     public static List<String> getFineTuneJobEventMessages(String fineTuneId){
-        String endpoint = 'https://api.openai.com/v1/fine-tunes/'+fineTuneId+'/events';
+        
+        String endpoint = 'https://api.openai.com/v1/fine_tuning/jobs/'+fineTuneId+'/events';
         String method = 'GET';
         String body = '';
         Http http = new Http();

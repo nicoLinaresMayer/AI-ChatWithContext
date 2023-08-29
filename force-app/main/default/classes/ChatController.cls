@@ -18,8 +18,31 @@ public with sharing class ChatController {
     public static void saveContextPrompts(Id sessionId,List<String> contextPrompts){
         SessionService.saveContextPrompts(sessionId,contextPrompts);
     }
+    @AuraEnabled
+    public static void uploadDatasetFile(List<String> rows, String fileName){
+        String datasetFile = ModelService.formatDatasetFile(rows);
+        ModelService.uploadDatasetFile(filename, datasetFile);
+        
+    }
 
+    @AuraEnabled(cacheable=true)
+    public static List<String> listFineTunes (){
+        return ModelService.listFineTunes();
+    }
 
+    @AuraEnabled(cacheable=true)
+    public static List<String> listDatasetFiles (){
+        return ModelService.listDatasetFiles();
+    }
+
+    @AuraEnabled
+    public static String createFineTune(String datasetName,String baseModel,String suffixName){
+        String datasetId = ModelService.getDatasetIdByName(datasetName);
+        
+        String fineTuneId  = ModelService.createFineTune(datasetId,baseModel,suffixName);
+        ModelService.createModelRecord(datasetId,baseModel,suffixName,fineTuneId);
+        return fineTuneId;
+    }
 
     //Single completion -- Deprecated by 3.5gpt-turbo fine-tuning
     /*@AuraEnabled

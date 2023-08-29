@@ -54,13 +54,10 @@ public with sharing class SessionService {
         if(!oldContextPrompts.isEmpty()){
             Database.delete(oldContextPrompts) ;
         }
-        system.debug('contextprompt linea 57 sessionService' + contextPrompts);
         List<Prompt__c> contextPromptsToInsert = new List<Prompt__c>();
         for(String prompt : contextPrompts){
             contextPromptsToInsert.add(new Prompt__c(Content__c = prompt , Response__c = '', Session__c = sessionId, Type__c = 'Context'));   
         }
-        system.debug('list'+contextPromptsToInsert);
-        system.debug('lista vacia?'+ contextPromptsToInsert.isEmpty());
         if(!contextPromptsToInsert.isEmpty()){
             try{
                 Database.insert(contextPromptsToInsert);
@@ -88,7 +85,7 @@ public with sharing class SessionService {
         return wrappedPrompts;
     }
     public static Session__c getSession(Id sessionId){
-        Session__c session = [SELECT Id,LastPromptIndex__c FROM Session__c];
+        Session__c session = [SELECT Id,LastPromptIndex__c FROM Session__c WHERE Id =:sessionId];
         return session;
     } 
 }

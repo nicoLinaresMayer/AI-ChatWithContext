@@ -10,3 +10,7 @@
 .chat {
     flex: 2; /* El segundo componente ocupará el doble de espacio */
 }
+
+.inputContainer{
+    max-width: 300px;
+}
