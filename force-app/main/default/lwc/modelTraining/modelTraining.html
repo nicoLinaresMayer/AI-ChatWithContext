@@ -1,0 +1,30 @@
+<template>
+    <lightning-card title="Model training" class="model-training">
+        <div class="slds-m-around_medium">
+            <p if:true={showNewModelAdded} style="color:green">New model added</p>
+            <lightning-combobox
+                label="Select base model"
+                value={selectedModel}
+                options={modelOptions}
+                onchange={handleModelChange}>
+            </lightning-combobox>
+        </div>
+        <div class="slds-m-around_medium">
+            <lightning-combobox
+                label="Select dataset file"
+                value={selectedDataset}
+                options={datasetOptions}
+                onchange={handleDatasetChange}
+                class="inputContainer"
+                >
+            </lightning-combobox>
+        </div>
+        <div class="slds-m-around_medium">
+            <lightning-input label="New Model Name :" value={newModelSuffix} onchange={handleChangeNewModelSuffix}  class="inputContainer"></lightning-input>
+        </div>
+        <div class="slds-align_absolute-center">
+            <lightning-button variant="brand" label="Train new Model" onclick={handleTrainModel} class="slds-m-horizontal_small"></lightning-button>
+            <lightning-button variant="brand" label="Check Selected Model Status" onclick={handleCheckModelStatus}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

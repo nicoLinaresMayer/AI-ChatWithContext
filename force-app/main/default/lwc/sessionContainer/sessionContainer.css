@@ -3,14 +3,25 @@
 }
 
 .chat-context {
-    flex: 1; /* El primer componente tomará el espacio disponible */
-    margin-right: 10px; /* Agregar margen derecho para separación */
+    flex: 1; 
+    margin-right: 10px; 
 }
 
 .chat {
-    flex: 2; /* El segundo componente ocupará el doble de espacio */
+    flex: 2; 
 }
 
 .inputContainer{
     max-width: 300px;
+}
+
+.combobox-container {
+    position: absolute;
+    top: 2.9rem; 
+    right: 0.5rem; 
+    padding: 1rem;
+}
+
+.slds-combobox {
+    width: 150px;
 }

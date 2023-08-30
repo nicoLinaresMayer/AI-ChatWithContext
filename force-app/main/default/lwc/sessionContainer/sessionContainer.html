@@ -1,7 +1,17 @@
 <template>
     <div class="container">
         <c-chat-context class="chat-context" session-id={recordId} onsavecontext={handleSaveContext}></c-chat-context>
-        <c-chat class="chat" session-id={recordId} model={model}></c-chat>
+        <c-chat class="chat" session-id={recordId} model={selectedModelNameId}></c-chat>
+       
+        <div class="slds-m-around_medium combobox-container">
+            <lightning-combobox
+                label="Select Model"
+                value={selectedModel}
+                options={modelOptions}
+                onchange={handleModelChange}
+                class="slds-combobox">
+            </lightning-combobox>
+        </div>
     </div>
     
 </template>

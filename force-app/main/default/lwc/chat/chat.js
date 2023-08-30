@@ -5,10 +5,12 @@ import retrieveChatMessages from '@salesforce/apex/ChatController.retrieveChat'
 
 export default class Chat extends LightningElement {
     @api sessionId;
+    @api model;
     prompt = '';
     response = '';
     messages = [];
     temperature = 0.8;
+
 
     val = 50;
     handleInputChange(event) {
@@ -34,7 +36,7 @@ export default class Chat extends LightningElement {
     handleButtonClick(){
         this.response = 'Waiting for response...';
         console.log(this.prompt);
-        getChatCompletion({ prompt: this.prompt,sessionId : this.sessionId, temperature : this.temperatureValue})
+        getChatCompletion({ prompt: this.prompt, model : this.model,sessionId : this.sessionId, temperature : this.temperatureValue})
         .then(result => {
             console.log('Resultado de Apex:', result);
             if(result!= ''){
@@ -44,7 +46,7 @@ export default class Chat extends LightningElement {
                 this.prompt = '';
             }
             else{
-                this.response = 'Error'
+                this.response = 'Error - Please check the status of fine-tuned model'
             }
             
             this.updateScroll();

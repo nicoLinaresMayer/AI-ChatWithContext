@@ -9,7 +9,7 @@ public with sharing class ModelService {
         String message ='';
 
         //{"messages": [{"role": "system", "content": "asd1"},{"role": "system", "content": "asd2"},{"role": "system", "content": "asd3"},{"role": "system", "content": "us"},{"role": "system", "content": "as"}]}
-        system.debug('jsonbefore'+jsonContent);
+
 
         HttpRequest req = new HttpRequest();
         req.setEndpoint(endpoint);
@@ -48,7 +48,7 @@ public with sharing class ModelService {
         //rows = new List<String>{'{"User":"Usercontent","System":"Context2\\nContext1","Assistant":"AssitantContent","Id":"row_wzwww"}'};
         //rows.add('{"User":"userContent2","System":"Context3\\nContext4","Assistant":"assistantcontent2","Id":"row_wzwww"}');
         
-        system.debug('firstrows'+ rows);
+
         List<String> proccessedRows = new List<String>();
         for(String row : rows){
             //cada row es : {User: 'asdasd', System: 'Contexto linea 1\nContexto linea 2\ncontexto linea 3', Assistant: 'dasdas', Id: 'row_wzwww'}
@@ -113,7 +113,6 @@ public with sharing class ModelService {
 
         if(res.getStatusCode() == 200){
             Map<String,Object> fineTunePropsByName = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
-            system.debug(fineTunePropsByName);
             fineTuneId = String.valueOf(fineTunePropsByName.get('id')); 
         }
         else{
@@ -184,6 +183,10 @@ public with sharing class ModelService {
         }
         return fineTunes;
     }
+
+    public static List<Model__c> getModels(){
+        return [SELECT Id,Name,Model_Id__c,Dataset_id__c FROM Model__c];
+    }
     public static List<String> listDatasetFiles (){
         String endpoint = 'https://api.openai.com/v1/files';
         String method = 'GET';
@@ -206,6 +209,25 @@ public with sharing class ModelService {
             system.debug('Error: ' + res.getStatus() + ' --- Code: '+res.getStatusCode());
         }
         return datasetFiles;
+    }
+//GET https://api.openai.com/v1/fine_tuning/jobs/{fine_tuning_job_id}
+    public static String getModelNameById(String fineTuneId){
+        String endpoint = 'https://api.openai.com/v1/fine_tuning/jobs/'+fineTuneId;
+        String method = 'GET';
+        String body = '';
+        Http http = new Http();
+        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+    
+        String modelNameId = '';
+        if(res.getStatusCode() == 200){
+            Map<String,Object> fineTuneProps = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
+            modelNameId = String.valueOf(fineTuneProps.get('fine_tuned_model'));
+            
+        }
+        else{
+            system.debug('Error: ' + res.getStatus() + ' --- Code: '+res.getStatusCode());
+        }
+        return modelNameId;
     }
     
     //GET https://api.openai.com/v1/fine-tunes/{fine_tune_id}/events

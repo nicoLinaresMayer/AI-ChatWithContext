@@ -26,7 +26,6 @@ public with sharing class PromptService {
             Map<String, Object> firstChoice = (Map<String, Object>) choicesList[0];
             Map<String, Object> messageMap = (Map<String, Object>) firstChoice.get('message');
             responseContent = (String) messageMap.get('content');
-            system.debug(responseContent);
             
         } 
         else {
@@ -58,6 +57,7 @@ public with sharing class PromptService {
         incomingPrompt = parsePrompt(incomingPrompt);
         List<Prompt__c> promptsList = SessionService.retrieveSessionPrompts(sessionId);
         List<Prompt__c> contextPromptsList = SessionService.retrieveContextPrompts(sessionId);
+        system.debug('CONTEXT PROMPT LIST');
         system.debug(contextPromptsList);
         List<String> messagesList = new List<String>();
         for (Prompt__c prompt : contextPromptsList) {
@@ -76,15 +76,18 @@ public with sharing class PromptService {
         return body;
     }
 
-    public static String getChatCompletion(String prompt, String sessionId,Decimal temperature){
+    public static String getChatCompletion(String prompt,String model, String sessionId,Decimal temperature){
         //Prepare api call
-        String model = 'gpt-3.5-turbo';
+        //String model = 'gpt-3.5-turbo';
+        system.debug('ESTOY USANDO EL MODELO:'+ model);
         String endpoint = 'https://api.openai.com/v1/chat/completions';
         String method = 'POST';
         String accessToken = ACCESS_TOKEN;
         //Get body with added new prompt
         String body = getRequestBodyWithNewPrompt(prompt,sessionId,model,temperature);
         //Make the call
+        system.debug('REQUEST BODY');
+        system.debug(body);
         HttpResponse res = apiCaller(endpoint, body, method, accessToken);
         String promptResponse = handleChatCompletionResponse(res,sessionId);
      

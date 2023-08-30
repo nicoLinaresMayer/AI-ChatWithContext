@@ -56,7 +56,10 @@ public with sharing class SessionService {
         }
         List<Prompt__c> contextPromptsToInsert = new List<Prompt__c>();
         for(String prompt : contextPrompts){
-            contextPromptsToInsert.add(new Prompt__c(Content__c = prompt , Response__c = '', Session__c = sessionId, Type__c = 'Context'));   
+            if(prompt!=''){
+                contextPromptsToInsert.add(new Prompt__c(Content__c = prompt , Response__c = '', Session__c = sessionId, Type__c = 'Context')); 
+            }
+              
         }
         if(!contextPromptsToInsert.isEmpty()){
             try{
@@ -82,6 +85,7 @@ public with sharing class SessionService {
             ));
         }
         
+
         return wrappedPrompts;
     }
     public static Session__c getSession(Id sessionId){

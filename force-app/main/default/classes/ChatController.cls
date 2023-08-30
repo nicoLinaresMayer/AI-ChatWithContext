@@ -1,7 +1,7 @@
 public with sharing class ChatController {
     @AuraEnabled
-    public static String getChatCompletion(String prompt, Id sessionId,Decimal temperature){
-        return PromptService.getChatCompletion(prompt,sessionId,temperature);
+    public static String getChatCompletion(String prompt, String model, Id sessionId,Decimal temperature){
+        return PromptService.getChatCompletion(prompt,model,sessionId,temperature);
     }
 
     @AuraEnabled(cacheable=true)
@@ -34,6 +34,10 @@ public with sharing class ChatController {
     public static List<String> listDatasetFiles (){
         return ModelService.listDatasetFiles();
     }
+    @AuraEnabled
+    public static List<Model__c> getModels (){
+        return ModelService.getModels();
+    }
 
     @AuraEnabled
     public static String createFineTune(String datasetName,String baseModel,String suffixName){
@@ -42,6 +46,15 @@ public with sharing class ChatController {
         String fineTuneId  = ModelService.createFineTune(datasetId,baseModel,suffixName);
         ModelService.createModelRecord(datasetId,baseModel,suffixName,fineTuneId);
         return fineTuneId;
+        
+    }
+    @AuraEnabled
+    public static List<String> getFineTuneJobEventMessages(String fineTuneId){
+       return ModelService.getFineTuneJobEventMessages(fineTuneId);
+    }
+    @AuraEnabled
+    public static String getModelNameById(String fineTuneId){
+        return ModelService.getModelNameById(fineTuneId);
     }
 
     //Single completion -- Deprecated by 3.5gpt-turbo fine-tuning

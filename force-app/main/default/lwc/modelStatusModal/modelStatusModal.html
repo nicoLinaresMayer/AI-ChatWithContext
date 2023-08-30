@@ -1,0 +1,13 @@
+<template>
+    <lightning-modal-header label={title}></lightning-modal-header>
+        <lightning-modal-body>     
+            <pre class="slds-text-heading_small">Fine tune events :  </pre>
+            <template if:true={statusMessages} for:each={statusMessages} for:item="message">
+                <pre key={message.Id} class={message.Class}>{message.Message}</pre>  
+                
+            </template>
+        </lightning-modal-body>
+    <lightning-modal-footer>
+        <lightning-button label="OK" onclick={handleOkay}></lightning-button>
+    </lightning-modal-footer>
+</template>
