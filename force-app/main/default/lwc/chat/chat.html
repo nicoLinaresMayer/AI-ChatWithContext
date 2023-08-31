@@ -24,7 +24,20 @@
             <div class="slds-p-around_medium lgc-bg">
                 <lightning-textarea type="text" value ={prompt} label="Enter your prompt" placeholder="" onchange={handleInputChange}></lightning-textarea>
             </div>
-            <lightning-button label="Send Prompt" onclick={handleButtonClick}></lightning-button>
+            <div style="display:flex">
+                <template if:true={responseIsLoading}>
+                    <div style="position:relative;margin-left:35px">
+                        <lightning-spinner size="small" alternative-text="Loading"></lightning-spinner>
+                    </div>
+                    
+                </template>
+                <template if:false={responseIsLoading}>
+                    <lightning-button label="Send Prompt" onclick={handleButtonClick}></lightning-button>
+                </template>
+               
+               
+            </div>
+            
             <p>
                 {response}
             </p>

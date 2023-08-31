@@ -57,7 +57,10 @@ export default class DatasetUpload extends LightningElement {
                     this.uploadFileIsLoading = false;
                     setTimeout(() => {
                         this.showRowsInfo = false;
-                    }, 3000)
+                    }, 3000);
+
+                    const RELOAD_EVENT =new CustomEvent('reloadfile',);
+                    this.dispatchEvent(RELOAD_EVENT);
        
                     })
                     .catch(error=>{

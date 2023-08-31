@@ -1,4 +1,4 @@
-import { LightningElement,wire} from 'lwc';
+import { LightningElement,wire,api} from 'lwc';
 import createFineTune from '@salesforce/apex/ChatController.createFineTune';
 import getModels from '@salesforce/apex/ChatController.getModels';
 import listDatasetFiles from '@salesforce/apex/ChatController.listDatasetFiles';
@@ -15,7 +15,7 @@ export default class ModelTraining extends LightningElement {
      selectedModel = 'gpt-3.5-turbo-0613';
      newModelSuffix = '';
      showNewModelAdded = false;
-
+     showNewModelAddedError = false;
  
      handleModelChange(event) {
          this.selectedModel = event.detail.value;    
@@ -31,32 +31,36 @@ export default class ModelTraining extends LightningElement {
 
     connectedCallback(){
         this.getModelsWrapper();
+        this.listDatasetFilesWrapper();
     }
 
-
-    @wire(listDatasetFiles, {})
-    wiredDatasets ({error, data}) {
-        if (data) {
+    listDatasetFilesWrapper(){
+        listDatasetFiles().then((data)=>{
             this.datasetOptions = data.map(item => ({
                 label: item,
                 value: item
             }));
-        } else if (error) {
+        }).catch(error=>{
             console.log(error)
-        }
+        })
     }
-
      // TRAIN MODEL
      handleTrainModel(){
          console.log('datasetName:'+this.selectedDataset + '  baseModel:'+ this.selectedModel + '  suffix:'+ this.newModelSuffix);
          createFineTune({datasetName : this.selectedDataset , baseModel : this.selectedModel, suffixName : this.newModelSuffix}).then((result)=>{
-             console.log('ok');
-             console.log(result);
-             this.getModelsWrapper();
-             this.showNewModelAdded = true;
-             setTimeout(() => {
-                this.showNewModelAdded = false;
-            }, 3000)
+             if(result!=''){
+                this.getModelsWrapper();
+                this.showNewModelAdded = true;
+                setTimeout(() => {
+                   this.showNewModelAdded = false;
+               }, 3000)
+             }
+            else{
+                this.showNewModelAddedError = true
+                setTimeout(() => {
+                    this.showNewModelAddedError = false;
+                }, 7000)
+            }
 
              
          }).catch(error=>{
@@ -100,6 +104,9 @@ export default class ModelTraining extends LightningElement {
         });
      }
 
+     handleRefreshDatasetList(){
+        this.listDatasetFilesWrapper();
+     }
     //Utils
     generateUniqueId() {
         return 'message_' + Math.random().toString(36).substr(2, 9);

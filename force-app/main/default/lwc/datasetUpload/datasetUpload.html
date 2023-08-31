@@ -1,5 +1,5 @@
 <template>
-    <lightning-card title="Dataset upload">
+    <lightning-card title="Dataset upload (Step 1)">
         <lightning-button label="Add Row" slot="actions" icon-name="utility:add" onclick={addRow}></lightning-button>
        <div class="slds-m-around_medium">
            <div class="slds-m-around_medium">
@@ -44,7 +44,7 @@
                </tbody>
            </table>
            <div class="slds-align_absolute-center">
-               <lightning-button variant="brand" label="Upload file" onclick={handleUploadFile}></lightning-button>
+               <lightning-button variant="brand" label="Save & Upload File" onclick={handleUploadFile}></lightning-button>
                <p if:true={showRowsInfo} class="slds-m-left_small">{rowsInfoMessage}</p>
                <lightning-spinner if:true={uploadFileisLoading} alternative-text="Loading" size="medium" class="spinner"></lightning-spinner>
            </div>

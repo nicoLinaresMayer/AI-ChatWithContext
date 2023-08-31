@@ -9,7 +9,8 @@ export default class Chat extends LightningElement {
     prompt = '';
     response = '';
     messages = [];
-    temperature = 0.8;
+    temperatureValue = 0.8;
+    responseIsLoading = false;
 
 
     val = 50;
@@ -34,7 +35,7 @@ export default class Chat extends LightningElement {
 
 
     handleButtonClick(){
-        this.response = 'Waiting for response...';
+        this.responseIsLoading = true;
         console.log(this.prompt);
         getChatCompletion({ prompt: this.prompt, model : this.model,sessionId : this.sessionId, temperature : this.temperatureValue})
         .then(result => {
@@ -48,7 +49,7 @@ export default class Chat extends LightningElement {
             else{
                 this.response = 'Error - Please check the status of fine-tuned model'
             }
-            
+            this.responseIsLoading = false;
             this.updateScroll();
             
         })

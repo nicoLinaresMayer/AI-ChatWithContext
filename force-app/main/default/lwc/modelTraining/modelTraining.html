@@ -1,7 +1,8 @@
 <template>
-    <lightning-card title="Model training" class="model-training">
+    <lightning-card title="Model training (Step 2)" class="model-training">
         <div class="slds-m-around_medium">
             <p if:true={showNewModelAdded} style="color:green">New model added</p>
+            <p if:true={showNewModelAddedError} style="color:red">Error - Job Creation Daily limit reached</p>
             <lightning-combobox
                 label="Select base model"
                 value={selectedModel}
@@ -18,6 +19,10 @@
                 class="inputContainer"
                 >
             </lightning-combobox>
+            <div class="slds-m-top_small">
+                <lightning-button variant="outline" label="Refresh" onclick={handleRefreshDatasetList}></lightning-button>
+            </div>
+           
         </div>
         <div class="slds-m-around_medium">
             <lightning-input label="New Model Name :" value={newModelSuffix} onchange={handleChangeNewModelSuffix}  class="inputContainer"></lightning-input>

@@ -30,7 +30,7 @@ public with sharing class ChatController {
         return ModelService.listFineTunes();
     }
 
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static List<String> listDatasetFiles (){
         return ModelService.listDatasetFiles();
     }

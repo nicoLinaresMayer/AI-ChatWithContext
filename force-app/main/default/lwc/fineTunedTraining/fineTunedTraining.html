@@ -1,6 +1,6 @@
 <template>
     <div class="slds-p-around_none slds-m-top_x-small slds-m-bottom_medium slds-m-horizontal_none container">
-        <c-dataset-upload class="dataset-upload"></c-dataset-upload>
+        <c-dataset-upload class="dataset-upload slds-p-right_x-small" file-upload={datasetNeedsReload} onreloadfile={handleReload}></c-dataset-upload>
         <c-model-training class="model-training"></c-model-training>
     </div>
 </template>

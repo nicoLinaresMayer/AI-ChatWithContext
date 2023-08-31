@@ -123,6 +123,7 @@ public with sharing class ModelService {
     }
 
     public static void createModelRecord(String datasetId,String baseModel,String suffixName, String fineTuneId){
+        system.debug('FINE TUNE ID FOR CREATE MODEL RECORD: ' + fineTuneId);
         Model__c parentModel = new Model__c();
         try{
             parentModel = [SELECT Id FROM Model__c WHERE Name=:baseModel]; 
