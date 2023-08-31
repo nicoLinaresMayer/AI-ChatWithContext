@@ -12,8 +12,6 @@ export default class Chat extends LightningElement {
     temperatureValue = 0.8;
     responseIsLoading = false;
 
-
-    val = 50;
     handleInputChange(event) {
         this.prompt = event.target.value;
     }

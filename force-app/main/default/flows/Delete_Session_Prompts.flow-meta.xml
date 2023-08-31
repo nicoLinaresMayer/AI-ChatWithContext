@@ -42,6 +42,13 @@
                 <elementReference>recordId.Id</elementReference>
             </value>
         </filters>
+        <filters>
+            <field>Type__c</field>
+            <operator>EqualTo</operator>
+            <value>
+                <stringValue>Default</stringValue>
+            </value>
+        </filters>
         <object>Prompt__c</object>
     </recordDeletes>
     <screens>

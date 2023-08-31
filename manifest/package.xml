@@ -25,19 +25,33 @@
 		<name>AuraDefinitionBundle</name>
 	</types>
 	<types>
+		<members>AI_Sales_Tool</members>
+		<name>CustomApplication</name>
+	</types>
+	<types>
 		<members>Prompt__c.Content__c</members>
 		<members>Prompt__c.Order__c</members>
 		<members>Prompt__c.Response__c</members>
 		<members>Prompt__c.Session__c</members>
+		<members>Prompt__c.Type__c</members>
+		<members>Session__c.LastPromptIndex__c</members>
+		<members>Session__c.Model__c</members>
 		<name>CustomField</name>
 	</types>
 	<types>
+		<members>Model__c</members>
 		<members>Prompt__c</members>
 		<members>Session__c</members>
 		<name>CustomObject</name>
 	</types>
 	<types>
-		<members>Session_Record_Page4</members>
+		<members>*</members>
+		<name>CustomTab</name>
+	</types>
+	<types>
+		<members>AI_Sales_Tool_UtilityBar</members>
+		<members>Home_Page_Default</members>
+		<members>Session_Record_Page</members>
 		<name>FlexiPage</name>
 	</types>
 	<types>
@@ -47,6 +61,10 @@
 	<types>
 		<members>*</members>
 		<name>LightningComponentBundle</name>
+	</types>
+	<types>
+		<members>AI_Chat_All_access</members>
+		<name>PermissionSet</name>
 	</types>
 	<types>
 		<members>Session__c.Delete_chat</members>
