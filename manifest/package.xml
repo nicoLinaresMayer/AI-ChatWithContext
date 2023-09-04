@@ -59,6 +59,12 @@
 		<name>Flow</name>
 	</types>
 	<types>
+		<members>Model__c-Model Layout</members>
+		<members>Prompt__c-Prompt Layout</members>
+		<members>Session__c-Session Layout</members>
+		<name>Layout</name>
+	</types>
+	<types>
 		<members>*</members>
 		<name>LightningComponentBundle</name>
 	</types>

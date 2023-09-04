@@ -27,7 +27,7 @@
                    <template for:each={rows} for:item="row">
                        <tr class="inputRows" key={row.Id}>
                            <th data-label="System Context" scope="row">
-                               <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={row.System} data-rowid={row.Id} data-rol="System" onchange={handleChange}></lightning-textarea>
+                               <lightning-textarea message-when-value-missing="Please enter value" value={row.System} data-rowid={row.Id} data-rol="System" onchange={handleChange}></lightning-textarea>
                            </th>
                            <td data-label="User Prompt">
                                <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={row.User} data-rowid={row.Id} data-rol="User" onchange={handleChange}></lightning-textarea>
