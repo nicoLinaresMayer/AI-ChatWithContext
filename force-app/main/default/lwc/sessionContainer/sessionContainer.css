@@ -1,0 +1,27 @@
+.container{
+    display:flex;
+}
+
+.chat-context {
+    flex: 1; 
+    margin-right: 10px; 
+}
+
+.chat {
+    flex: 2; 
+}
+
+.inputContainer{
+    max-width: 300px;
+}
+
+.combobox-container {
+    position: absolute;
+    top: 2.9rem; 
+    right: 0.5rem; 
+    padding: 1rem;
+}
+
+.slds-combobox {
+    width: 150px;
+}

@@ -1,0 +1,16 @@
+<template>
+    <lightning-card title="Context">
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading"></lightning-spinner>
+        </template>
+        <div if:false={isLoading} class="slds-p-around_medium">
+            <lightning-textarea
+                message-when-value-missing="Please enter value separated by line breaks"
+                value={contextPrompts}
+                onchange={handleChange}
+            ></lightning-textarea>
+            <div if:true={infoMessage}>{infoMessage}</div>
+            <lightning-button variant="brand" label="Save" onclick={handleSave}></lightning-button>
+        </div>
+    </lightning-card>
+</template>

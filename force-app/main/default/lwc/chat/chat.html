@@ -1,0 +1,48 @@
+<template>
+    <lightning-card title="AI Chat">
+        <div class="slds-m-top_large slds-m-bottom_x-large slds-m-horizontal_x-small">
+            <div class="chat-container">
+                <template if:true={messages}>
+                    <ul class="message-list overflow">
+                        <template for:each={messages} for:item="message">
+                            <li key={message.Id} class="message-item">
+                                <pre class="message-box user-box">
+                                    {message.Content}
+                                </pre>
+                                <pre class="message-box system-box">
+                                    {message.Response}
+                                </pre>
+                            </li>
+                            
+                        </template>
+                    </ul>
+                </template>
+                
+                
+            </div>
+            <lightning-slider class="slider" label="Temperature" min="0" max="2" step="0.01" size="x-small" value={temperatureValue} onchange={handleSliderChange}></lightning-slider>
+            <div class="slds-p-around_medium lgc-bg">
+                <lightning-textarea type="text" value ={prompt} label="Enter your prompt" placeholder="" onchange={handleInputChange}></lightning-textarea>
+            </div>
+            <div style="display:flex">
+                <template if:true={responseIsLoading}>
+                    <div style="position:relative;margin-left:35px">
+                        <lightning-spinner size="small" alternative-text="Loading"></lightning-spinner>
+                    </div>
+                    
+                </template>
+                <template if:false={responseIsLoading}>
+                    <lightning-button label="Send Prompt" onclick={handleButtonClick}></lightning-button>
+                </template>
+               
+               
+            </div>
+            
+            <p>
+                {response}
+            </p>
+        </div>
+    
+    </lightning-card>
+  
+</template>
