@@ -1,6 +1,6 @@
 import { LightningElement,api} from 'lwc';
 import getModels from '@salesforce/apex/ChatController.getModels';
-import getModelNameById from '@salesforce/apex/ChatController.getModelNameById';
+import getModelNameById from '@salesforce/apex/FineTuningController.getModelNameById';
 
 export default class SessionContainer extends LightningElement {
     

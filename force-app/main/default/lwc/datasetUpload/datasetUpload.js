@@ -1,5 +1,5 @@
 import { LightningElement,wire } from 'lwc';
-import uploadDatasetFile from '@salesforce/apex/ChatController.uploadDatasetFile';
+import uploadDatasetFile from '@salesforce/apex/FineTuningController.uploadDatasetFile';
 
 export default class DatasetUpload extends LightningElement {
 

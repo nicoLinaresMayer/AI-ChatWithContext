@@ -1,8 +1,8 @@
 import { LightningElement,wire,api} from 'lwc';
-import createFineTune from '@salesforce/apex/ChatController.createFineTune';
+import createFineTune from '@salesforce/apex/FineTuningController.createFineTune';
 import getModels from '@salesforce/apex/ChatController.getModels';
 import listDatasetFiles from '@salesforce/apex/ChatController.listDatasetFiles';
-import getModelEventMessages from '@salesforce/apex/ChatController.getFineTuneJobEventMessages';
+import getModelEventMessages from '@salesforce/apex/FineTuningController.getFineTuneJobEventMessages';
 import modelStatusModal from 'c/modelStatusModal';
 
 
