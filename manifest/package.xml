@@ -39,6 +39,8 @@
 		<name>CustomField</name>
 	</types>
 	<types>
+		<members>Dataset__c</members>
+		<members>Example__c</members>
 		<members>Model__c</members>
 		<members>Prompt__c</members>
 		<members>Session__c</members>

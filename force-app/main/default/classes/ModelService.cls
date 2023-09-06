@@ -1,8 +1,9 @@
 public with sharing class ModelService {
+
+    class HttpException extends Exception{}
     static final String ACCESS_TOKEN = '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';
 
-
-    //POST https://api.openai.com/v1/files
+//Dataset Operations
     public static void uploadDatasetFile(String fileName,String jsonContent){
         String accessToken = ACCESS_TOKEN;
         String endpoint = ' https://api.openai.com/v1/files';
@@ -41,10 +42,10 @@ public with sharing class ModelService {
         if (res.getStatusCode() == 200) {
             System.debug(res.getBody());
         } else {
-            System.debug(res.getStatus());
+            throw new HttpException('Error code : '+res.getStatusCode());
         }
     }
-    public static String formatDatasetFile(List<String> rows){
+    public static List<String> formatRows(List<String> rows){
         //rows = new List<String>{'{"User":"Usercontent","System":"Context2\\nContext1","Assistant":"AssitantContent","Id":"row_wzwww"}'};
         //rows.add('{"User":"userContent2","System":"Context3\\nContext4","Assistant":"assistantcontent2","Id":"row_wzwww"}');
         
@@ -64,15 +65,17 @@ public with sharing class ModelService {
             String rowJson = '{"messages": ['+joinedString+']}';
             proccessedRows.add(rowJson);
         }
-       
-        String proccessedJson = String.join(proccessedRows,'\n');
-        proccessedJson+= '\n';
-        system.debug(proccessedJson);
-        return proccessedJson;
+        return proccessedRows;
         /*'{"messages": [{"role": "system", "content": "La empresa es Cloudgaia, tiene 400 empleados, mas de 600 certificaciones. Radica en San Isidro, EEUU y Reino Unido"},{"role":"user","content":"Cual es la empresa?"},{"role":"assistant","content":"Cloudgaia"}]}'*/
 
     }
-     //GET https://api.openai.com/v1/files
+
+    public static String getDatasetTextFile(List<String> proccessedRows){
+        String proccessedJson = String.join(proccessedRows,'\n');
+        proccessedJson+= '\n';
+        return proccessedJson;
+    }
+   
     public static String getDatasetIdByName(String fileName){
         String endpoint = 'https://api.openai.com/v1/files';
         String method = 'GET';
@@ -98,9 +101,38 @@ public with sharing class ModelService {
 
         return datasetFileId;
     }
+    public static List<String> listDatasetFiles (){
+        String endpoint = 'https://api.openai.com/v1/files';
+        String method = 'GET';
+        String body = '';
+        Http http = new Http();
+        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
     
-    //old POST https://api.openai.com/v1/fine-tunes
-    //new POST https://api.openai.com/v1/fine_tuning/jobs
+        List<String> datasetFiles = new List<String>();
+        if(res.getStatusCode() == 200){
+            Map<String,Object> datasetProps = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
+            List<Object> datasetData= (List<Object>) datasetProps.get('data');
+            
+            for(Object obj  : datasetData){
+                Map<String,Object> objMap = (Map<String,Object>) obj;
+                datasetFiles.add((String)objMap.get('filename'));   
+                
+            }
+        }
+        else{
+            system.debug('Error: ' + res.getStatus() + ' --- Code: '+res.getStatusCode());
+        }
+        return datasetFiles;
+    }
+    public static void registerDatasetExamples(List<String> examples){
+        
+    }
+    public static List<Example__c> retrieveDatasetExamples(List<String> examples){
+        
+    }
+    
+
+//Fine tune / Model Operations
     public static String createFineTune(String datasetId, String baseModel, String suffixName){
         String endpoint = 'https://api.openai.com/v1/fine_tuning/jobs';
         String method = 'POST';
@@ -188,30 +220,7 @@ public with sharing class ModelService {
     public static List<Model__c> getModels(){
         return [SELECT Id,Name,Model_Id__c,Dataset_id__c FROM Model__c];
     }
-    public static List<String> listDatasetFiles (){
-        String endpoint = 'https://api.openai.com/v1/files';
-        String method = 'GET';
-        String body = '';
-        Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
-    
-        List<String> datasetFiles = new List<String>();
-        if(res.getStatusCode() == 200){
-            Map<String,Object> datasetProps = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
-            List<Object> datasetData= (List<Object>) datasetProps.get('data');
-            
-            for(Object obj  : datasetData){
-                Map<String,Object> objMap = (Map<String,Object>) obj;
-                datasetFiles.add((String)objMap.get('filename'));   
-                
-            }
-        }
-        else{
-            system.debug('Error: ' + res.getStatus() + ' --- Code: '+res.getStatusCode());
-        }
-        return datasetFiles;
-    }
-//GET https://api.openai.com/v1/fine_tuning/jobs/{fine_tuning_job_id}
+
     public static String getModelNameById(String fineTuneId){
         String endpoint = 'https://api.openai.com/v1/fine_tuning/jobs/'+fineTuneId;
         String method = 'GET';
@@ -231,7 +240,6 @@ public with sharing class ModelService {
         return modelNameId;
     }
     
-    //GET https://api.openai.com/v1/fine-tunes/{fine_tune_id}/events
     //Here we get job status messages to view if model's training is finished.
     public static List<String> getFineTuneJobEventMessages(String fineTuneId){
         

@@ -27,8 +27,11 @@ public with sharing class FineTuningController {
     // Dataset operations
     @AuraEnabled
     public static void uploadDatasetFile(List<String> rows, String fileName){
-        String datasetFile = ModelService.formatDatasetFile(rows);
+        List<String> proccessedRows = ModelService.formatRows(rows);
+        String datasetFile = ModelService.getDatasetTextFile(proccessedRows);
+        datasetFile = 'asdasdas//askdlasd{{}{{}}}';
         ModelService.uploadDatasetFile(filename, datasetFile);
+        ModelService.registerDatasetExamples(proccessedRows);
     }
 
     @AuraEnabled
