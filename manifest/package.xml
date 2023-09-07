@@ -40,6 +40,7 @@
 	</types>
 	<types>
 		<members>Model__c</members>
+		<members>Open_Ai__c</members>
 		<members>Prompt__c</members>
 		<members>Session__c</members>
 		<name>CustomObject</name>
