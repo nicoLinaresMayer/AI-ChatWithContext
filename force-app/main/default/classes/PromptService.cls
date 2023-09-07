@@ -1,5 +1,5 @@
 public with sharing class PromptService {
-    static final string ACCESS_TOKEN = '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';
+    static final string ACCESS_TOKEN = Utils.getApiKey();
     public static HttpResponse apiCaller(String endpoint, String body, String method,String accessToken){
         // Set HTTP Request
         HttpRequest req = new HttpRequest();

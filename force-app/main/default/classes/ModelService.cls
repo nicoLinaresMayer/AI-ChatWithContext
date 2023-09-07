@@ -1,6 +1,5 @@
 public with sharing class ModelService {
-    static final String ACCESS_TOKEN = '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';
-
+    static final String ACCESS_TOKEN = Utils.getApiKey();
 
     //POST https://api.openai.com/v1/files
     public static void uploadDatasetFile(String fileName,String jsonContent){
