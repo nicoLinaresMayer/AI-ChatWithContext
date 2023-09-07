@@ -29,6 +29,8 @@
 		<name>CustomApplication</name>
 	</types>
 	<types>
+		<members>Example__c.Dataset__c</members>
+		<members>Model__c.Dataset_Id__c</members>
 		<members>Prompt__c.Content__c</members>
 		<members>Prompt__c.Order__c</members>
 		<members>Prompt__c.Response__c</members>
