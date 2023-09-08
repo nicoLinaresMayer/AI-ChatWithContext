@@ -1,11 +1,21 @@
 <template>
     <lightning-card title="Dataset upload (Step 1)">
-        <lightning-button label="Add Row" slot="actions" icon-name="utility:add" onclick={addRow}></lightning-button>
        <div class="slds-m-around_medium">
-           <div class="slds-m-around_medium">
-               <lightning-input label="New dataset name (required):" value={newDatasetFileName} onchange={handleChangenewDatasetFileName} class="inputContainer"></lightning-input>
+           <div class="slds-align_absolute-center">
+                <lightning-button class="slds-align-middle" label="Create new Dataset" slot="actions" icon-name="utility:add" onclick={handleNewDataset}></lightning-button>
+                <p class="slds-m-horizontal_medium">Or</p>
+                <lightning-combobox
+                    value={selectedDataset}
+                    options={datasetOptions}
+                    onchange={handleDatasetChange}
+                    variant="label-hidden"
+                    placeholder="Select existing Dataset"
+                    >
+                </lightning-combobox>
            </div>
-           <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label">
+           <lightning-spinner if:true={tableIsLoading} alternative-text="Loading" size="large"></lightning-spinner>
+           <template if:true={rows}>
+           <table class="slds-table slds-table_cell-buffer slds-table_bordered" aria-labelledby="element-with-table-label other-element-with-table-label" if:false={tableIsLoading}>
                <thead>
                    <tr class="slds-line-height_reset">
                        <th class="" scope="col">
@@ -27,14 +37,14 @@
                    <template for:each={rows} for:item="row">
                        <tr class="inputRows" key={row.Id}>
                            <th data-label="System Context" scope="row">
-                               <lightning-textarea message-when-value-missing="Please enter value" value={row.System} data-rowid={row.Id} data-rol="System" onchange={handleChange}></lightning-textarea>
+                               <lightning-textarea message-when-value-missing="Please enter value" value={row.SystemMsg} data-rowid={row.Id} data-rol="SystemMsg" onchange={handleChange}></lightning-textarea>
                            </th>
                            <td data-label="User Prompt">
-                               <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={row.User} data-rowid={row.Id} data-rol="User" onchange={handleChange}></lightning-textarea>
+                               <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={row.UserMsg} data-rowid={row.Id} data-rol="UserMsg" onchange={handleChange}></lightning-textarea>
                               
                            </td>
                            <td data-label="Assistant Response">
-                               <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={row.Assistant} data-rowid={row.Id} data-rol="Assistant"  onchange={handleChange}></lightning-textarea>
+                               <lightning-textarea max-length="150" message-when-value-missing="Please enter value" value={row.AssistantMsg} data-rowid={row.Id} data-rol="AssistantMsg"  onchange={handleChange}></lightning-textarea>
                            </td>
                            <td data-label="Delete row">
                                <lightning-button-icon icon-name="action:delete"  alternative-text="Delete" title="Delete" data-id={row.Id} onclick={deleteRow}></lightning-button-icon>
@@ -43,12 +53,17 @@
                    </template>
                </tbody>
            </table>
+           <lightning-button class="slds-align_absolute-center slds-m-bottom_medium" label="Add Row" slot="actions" icon-name="utility:add" onclick={addRow}></lightning-button>
            <div class="slds-align_absolute-center">
-               <lightning-button variant="brand" label="Save & Upload File" onclick={handleUploadFile}></lightning-button>
+            
+            <div>
+                <lightning-button variant="brand" label="Save File" onclick={handleSaveFile}></lightning-button>
+                <lightning-button class="slds-m-left_small" variant="brand" label="Upload File" onclick={handleUploadFile}></lightning-button>
+            </div>
                <p if:true={showRowsInfo} class="slds-m-left_small">{rowsInfoMessage}</p>
                <lightning-spinner if:true={uploadFileisLoading} alternative-text="Loading" size="medium" class="spinner"></lightning-spinner>
            </div>
-         
-       </div>
+        </template>
+       </div>    
    </lightning-card>
 </template>

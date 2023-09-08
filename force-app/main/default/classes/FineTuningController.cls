@@ -26,17 +26,31 @@ public with sharing class FineTuningController {
 
     // Dataset operations
     @AuraEnabled
-    public static void uploadDatasetFile(List<String> rows, String fileName){
+    public static void uploadDatasetFile(List<String> rows, Id datasetId){
         List<String> proccessedRows = ModelService.formatRows(rows);
         String datasetFile = ModelService.getDatasetTextFile(proccessedRows);
-        datasetFile = 'asdasdas//askdlasd{{}{{}}}';
+        String filename = ModelService.getDatasetNameById(datasetId)+ '.jsonl';
         ModelService.uploadDatasetFile(filename, datasetFile);
-        ModelService.registerDatasetExamples(proccessedRows);
+        //ModelService.registerDatasetExamples(proccessedRows);
     }
 
     @AuraEnabled
     public static List<String> listDatasetFiles (){
         return ModelService.listDatasetFiles();
+    }
+    @AuraEnabled
+    public static List<ModelService.ExampleWrapper> retrieveExamples(Id datasetId){
+       return ModelService.retrieveExamples(datasetId);
+    }
+
+    @AuraEnabled
+    public static void saveExamples(String examplesJson, Id datasetId){
+        ModelService.saveExamples(examplesJson, datasetId);
+    }
+
+    @AuraEnabled
+    public static List<Dataset__c> getDatasets(){
+       return ModelService.getDatasets();
     }
     
 }

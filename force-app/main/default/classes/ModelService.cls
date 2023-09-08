@@ -1,9 +1,13 @@
 public with sharing class ModelService {
 
     class HttpException extends Exception{}
-    static final String ACCESS_TOKEN = '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';
+    static final String ACCESS_TOKEN = Utils.getApiKey();
 
 //Dataset Operations
+    public static String getDatasetNameById(Id datasetId){
+        Dataset__c dataset = [SELECT Name FROM Dataset__c WHERE ID=:datasetId LIMIT 1];
+        return dataset.Name;
+    }
     public static void uploadDatasetFile(String fileName,String jsonContent){
         String accessToken = ACCESS_TOKEN;
         String endpoint = ' https://api.openai.com/v1/files';
@@ -56,11 +60,11 @@ public with sharing class ModelService {
 
             Map<String, Object> rowMapped = (Map<String, Object>) JSON.deserializeUntyped(row);
             List<String> systemLine = new List<String>();
-            for(String line : String.valueOf(rowMapped.get('System')).split('\n')){
+            for(String line : String.valueOf(rowMapped.get('SystemMsg')).split('\n')){
             systemLine.add('{"role": "system", "content": "'+line+'"}'); 
             }
-            systemLine.add('{"role": "user", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('User')))+'"}');
-            systemLine.add('{"role": "assistant", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('Assistant')))+'"}');
+            systemLine.add('{"role": "user", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('UserMsg')))+'"}');
+            systemLine.add('{"role": "assistant", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('AssistantMsg')))+'"}');
             String joinedString = String.join(systemLine,',');
             String rowJson = '{"messages": ['+joinedString+']}';
             proccessedRows.add(rowJson);
@@ -124,11 +128,67 @@ public with sharing class ModelService {
         }
         return datasetFiles;
     }
-    public static void registerDatasetExamples(List<String> examples){
+
+    public static List<Dataset__c> getDatasets(){
+        return [SELECT Id,Name FROM Dataset__c];
+    }
+    public static List<ExampleWrapper> retrieveExamples(Id datasetId){
+        List<ExampleWrapper> examplesWrapped = new List<ExampleWrapper>();
+        for(Example__c example : [SELECT Id,Content__c FROM Example__c WHERE Dataset__c =:datasetId ORDER BY CreatedDate asc ]){
+            system.debug(example.Content__c);
+            Map<String,Object> exampleMap = (Map<String,Object>)JSON.deserializeUntyped(example.Content__c);
+            examplesWrapped.add(new ExampleWrapper(example.Id,String.valueOf(exampleMap.get('SystemMsg')),String.valueOf(exampleMap.get('UserMsg')),String.valueOf(exampleMap.get('AssistantMsg'))));
+        }
+        system.debug(examplesWrapped);
+        return examplesWrapped; 
+    }
+
+    public static void saveExamples(String examplesJson, Id datasetId){
+        Map<Id,Example__c> examplesMap = new Map<Id,Example__c>([SELECT Id FROM Example__c]);
+        List<Object> objectList = (List<Object>)JSON.deserializeUntyped(examplesJson);
+        List<Example__c> examplesToInsert = new List<Example__c>();
+        List<Example__c> examplesToUpdate = new List<Example__c>();
+        
+        for(Object obj : objectList){
+            Map<String,Object> objectMap = (Map<String,Object>) obj;
+            String exampleId = (String) objectMap.get('Id');
+            if(!exampleId.contains('row_') && examplesMap.containsKey(exampleId)){
+                system.debug('entro al if');
+                Example__c record = examplesMap.get(exampleId);
+                record.Content__c = JSON.serialize(obj);
+                examplesToUpdate.add(record);
+            }
+            else{
+                system.debug('contains _row');
+                examplesToInsert.add(new Example__c(Dataset__c = datasetId, Content__c = JSON.serialize(obj)));
+            }
+            
+        }
+
+        insert examplesToInsert;
+        update examplesToUpdate;
         
     }
-    public static List<Example__c> retrieveDatasetExamples(List<String> examples){
-        
+    
+ 
+    
+    public class ExampleWrapper{
+        @auraEnabled
+        public String Id{get;set;}
+        @auraEnabled
+        public String SystemMsg{get;set;}
+        @auraEnabled
+        public String UserMsg{get;set;}
+        @auraEnabled
+        public String AssistantMsg{get;set;}
+
+        public ExampleWrapper(Id Id,String SystemMsg, String UserMsg , String AssistantMsg){
+            this.Id = Id;
+            this.SystemMsg = SystemMsg;
+            this.UserMsg = UserMsg;
+            this.AssistantMsg = AssistantMsg;
+
+        }
     }
     
 

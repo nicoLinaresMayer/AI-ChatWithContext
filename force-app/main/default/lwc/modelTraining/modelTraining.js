@@ -86,7 +86,7 @@ export default class ModelTraining extends LightningElement {
         await getModelEventMessages({fineTuneId : this.selectedModel}).then(result=>{
             this.resultMessages = result.map(item=>{
                 let isFinished = false;
-                if(item.includes('job successfully completed')){
+                if(item.includes('successfully completed')){
                     isFinished = true;
                     modelIsFinished = true;
                 }
