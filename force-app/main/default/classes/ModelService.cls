@@ -60,7 +60,7 @@ public with sharing class ModelService {
 
             Map<String, Object> rowMapped = (Map<String, Object>) JSON.deserializeUntyped(row);
             List<String> systemLine = new List<String>();
-            for(String line : String.valueOf(rowMapped.get('SystemMsg')).split('\n')){
+            for(String line : String.valueOf(rowMapped.get('SystemMsg')).split('__-__')){
             systemLine.add('{"role": "system", "content": "'+line+'"}'); 
             }
             systemLine.add('{"role": "user", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('UserMsg')))+'"}');

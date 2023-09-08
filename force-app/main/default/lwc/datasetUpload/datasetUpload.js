@@ -59,8 +59,7 @@ export default class DatasetUpload extends LightningElement {
         }
         catch(error){
             console.log('error->'+error);
-        }
-            
+        }       
     }
 
     handleDatasetChange(event){
