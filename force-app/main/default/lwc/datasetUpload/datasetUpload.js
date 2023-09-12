@@ -22,16 +22,7 @@ export default class DatasetUpload extends LightningElement {
     tableIsLoading = true;
 
     connectedCallback(){
-        getDatasets({}).then(data=>{
-            this.datasetOptions = data.map(item => ({
-                label: item.Name,
-                value: item.Id
-            }));
-            
-            this.tableIsLoading=false;
-        }).catch(error=>{
-            console.log(error);
-        });
+        this.getDatasetsWrapper();
 
     }
     retrieveExamplesWrapper(){
@@ -69,7 +60,7 @@ export default class DatasetUpload extends LightningElement {
     }
     handleUploadFile(){
         console.log(JSON.stringify(this.rows));
-        if(this.rows.length<10){
+        if(this.rows.length>10){
             this.rowsInfoMessage = 'Add at least 10 entries';
             this.showRowsInfo = true;
             setTimeout(() => {
@@ -114,6 +105,7 @@ export default class DatasetUpload extends LightningElement {
     handleSaveFile(){
         console.log(JSON.parse(JSON.stringify(this.rows)));
         let rows = JSON.stringify(this.rows);
+        console.log('rows->'+rows);
         saveExamples({examplesJson: rows, datasetId:this.selectedDataset}).then(()=>{
             this.rowsInfoMessage = 'Saved';
                 this.showRowsInfo = true;
@@ -161,6 +153,7 @@ export default class DatasetUpload extends LightningElement {
         title : 'New Dataset'
 
     });
+    this.getDatasetsWrapper();
 
 
    }
@@ -168,5 +161,17 @@ export default class DatasetUpload extends LightningElement {
     this.isModalOpen = false;
    }
 
+   getDatasetsWrapper(){
+    getDatasets({}).then(data=>{
+        this.datasetOptions = data.map(item => ({
+            label: item.Name,
+            value: item.Id
+        }));
+        
+        this.tableIsLoading=false;
+    }).catch(error=>{
+        console.log(error);
+    });
+   }
    
 }

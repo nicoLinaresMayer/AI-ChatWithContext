@@ -2,11 +2,10 @@ public with sharing class FineTuningController {
     
     // Fine tunes creation
     @AuraEnabled
-    public static String createFineTune(String datasetName,String baseModel,String suffixName){
-        String datasetId = ModelService.getDatasetIdByName(datasetName);
-        String fineTuneId  = ModelService.createFineTune(datasetId,baseModel,suffixName);
-        ModelService.createModelRecord(datasetId,baseModel,suffixName,fineTuneId);
-        return fineTuneId;
+    public static String createFineTune(String datasetId,String baseModel,String suffixName){
+        String result  = ModelService.createFineTune(datasetId,baseModel,suffixName);
+        ModelService.createModelRecord(datasetId,baseModel,suffixName,result);
+        return result;
         
     }
     // Get model's information
@@ -27,11 +26,7 @@ public with sharing class FineTuningController {
     // Dataset operations
     @AuraEnabled
     public static void uploadDatasetFile(List<String> rows, Id datasetId){
-        List<String> proccessedRows = ModelService.formatRows(rows);
-        String datasetFile = ModelService.getDatasetTextFile(proccessedRows);
-        String filename = ModelService.getDatasetNameById(datasetId)+ '.jsonl';
-        ModelService.uploadDatasetFile(filename, datasetFile);
-        //ModelService.registerDatasetExamples(proccessedRows);
+        ModelService.uploadDatasetFile(rows, datasetId);
     }
 
     @AuraEnabled

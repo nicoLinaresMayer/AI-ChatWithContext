@@ -8,13 +8,27 @@ public with sharing class ModelService {
         Dataset__c dataset = [SELECT Name FROM Dataset__c WHERE ID=:datasetId LIMIT 1];
         return dataset.Name;
     }
-    public static void uploadDatasetFile(String fileName,String jsonContent){
+    public static void uploadDatasetFile(List<String> rows, Id datasetId){
+        List<String> proccessedRows = ModelService.formatRows(rows,datasetId);
+        String datasetFile = ModelService.getDatasetTextFile(proccessedRows);
+        String filename = ModelService.getDatasetNameById(datasetId)+ '.jsonl';
+        String response = uploadFileToOpenAi(fileName,datasetFile);
+
+        Dataset__c dataset = [SELECT Id,Status__c,filename__c,Id__c FROM Dataset__c WHERE Id=:datasetId];
+        Map<String,Object> responseMap = (Map<String,Object>) JSON.deserializeUntyped(response);
+        dataset.Status__c = (String) responseMap.get('status');
+        dataset.filename__c = (String) responseMap.get('filename');
+        dataset.Id__c = (String) responseMap.get('id');
+        update dataset;
+
+
+    }
+
+    public static string uploadFileToOpenAi(String fileName,String jsonContent){
         String accessToken = ACCESS_TOKEN;
         String endpoint = ' https://api.openai.com/v1/files';
         String message ='';
-
-        //{"messages": [{"role": "system", "content": "asd1"},{"role": "system", "content": "asd2"},{"role": "system", "content": "asd3"},{"role": "system", "content": "us"},{"role": "system", "content": "as"}]}
-
+        String response = '';
 
         HttpRequest req = new HttpRequest();
         req.setEndpoint(endpoint);
@@ -39,21 +53,26 @@ public with sharing class ModelService {
         body += '--' + boundary + '--';
 
         req.setBody(body);
-
+        system.debug('body->'+body);
         Http http = new Http();
         HttpResponse res = http.send(req);
 
         if (res.getStatusCode() == 200) {
-            System.debug(res.getBody());
+            response = res.getBody();
         } else {
             throw new HttpException('Error code : '+res.getStatusCode());
         }
+        return response;
     }
-    public static List<String> formatRows(List<String> rows){
+    public static List<String> formatRows(List<String> rows, Id datasetId){
         //rows = new List<String>{'{"User":"Usercontent","System":"Context2\\nContext1","Assistant":"AssitantContent","Id":"row_wzwww"}'};
         //rows.add('{"User":"userContent2","System":"Context3\\nContext4","Assistant":"assistantcontent2","Id":"row_wzwww"}');
-        
-
+        rows = new List<String>();
+        system.debug('rows debiera estar vacia->'+rows);
+        for(Example__c ex : [SELECT Id,Content__c FROM Example__c WHERE Dataset__c=:datasetId]){
+            rows.add(ex.Content__c);
+        }
+ 
         List<String> proccessedRows = new List<String>();
         for(String row : rows){
             //cada row es : {User: 'asdasd', System: 'Contexto linea 1\nContexto linea 2\ncontexto linea 3', Assistant: 'dasdas', Id: 'row_wzwww'}
@@ -61,7 +80,7 @@ public with sharing class ModelService {
             Map<String, Object> rowMapped = (Map<String, Object>) JSON.deserializeUntyped(row);
             List<String> systemLine = new List<String>();
             for(String line : String.valueOf(rowMapped.get('SystemMsg')).split('__-__')){
-            systemLine.add('{"role": "system", "content": "'+line+'"}'); 
+            systemLine.add('{"role": "system", "content": "'+PromptService.parsePrompt(line)+'"}'); 
             }
             systemLine.add('{"role": "user", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('UserMsg')))+'"}');
             systemLine.add('{"role": "assistant", "content": "'+PromptService.parsePrompt(String.valueOf(rowMapped.get('AssistantMsg')))+'"}');
@@ -85,7 +104,7 @@ public with sharing class ModelService {
         String method = 'GET';
         String body = '';
         Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+        HttpResponse res = Utils.apiCaller(endpoint,body,method);
 
         String datasetFileId = '';
         if(res.getStatusCode()== 200){
@@ -110,7 +129,7 @@ public with sharing class ModelService {
         String method = 'GET';
         String body = '';
         Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+        HttpResponse res = Utils.apiCaller(endpoint,body,method);
     
         List<String> datasetFiles = new List<String>();
         if(res.getStatusCode() == 200){
@@ -130,7 +149,7 @@ public with sharing class ModelService {
     }
 
     public static List<Dataset__c> getDatasets(){
-        return [SELECT Id,Name FROM Dataset__c];
+        return [SELECT Id,Name,Id__c FROM Dataset__c];
     }
     public static List<ExampleWrapper> retrieveExamples(Id datasetId){
         List<ExampleWrapper> examplesWrapped = new List<ExampleWrapper>();
@@ -169,8 +188,27 @@ public with sharing class ModelService {
         update examplesToUpdate;
         
     }
-    
- 
+    @future(callout=true)
+    public static void deleteDatasetsFromServer(List<String> datasetsIds){
+        String apiKey = Utils.getApiKey();
+        for(String datasetId : datasetsIds){
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint('https://api.openai.com/v1/files/'+datasetId);
+            req.setMethod('DELETE');
+            req.setHeader('Authorization','Bearer '+apiKey );
+            req.setHeader('Content-Type', 'application/json; charset=UTF-8');
+            req.setTimeout(120000);
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            if (res.getStatusCode() == 200) {
+                System.debug('File deleted');
+            } else {
+                throw new HttpException('Error code : '+res.getStatusCode());
+            }
+        }
+           
+
+    }
     
     public class ExampleWrapper{
         @auraEnabled
@@ -196,26 +234,30 @@ public with sharing class ModelService {
     public static String createFineTune(String datasetId, String baseModel, String suffixName){
         String endpoint = 'https://api.openai.com/v1/fine_tuning/jobs';
         String method = 'POST';
+        suffixName = suffixName.substring(0, Math.min(suffixName.length(), 18));
         String body = '{"training_file":"'+datasetId+'" , "model":"'+baseModel+'" , "suffix":"'+suffixName+'"}';
         system.debug(body);
         Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+        HttpResponse res = Utils.apiCaller(endpoint,body,method);
         
-        String fineTuneId = '';
+        String result = '';
 
         if(res.getStatusCode() == 200){
             Map<String,Object> fineTunePropsByName = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
-            fineTuneId = String.valueOf(fineTunePropsByName.get('id')); 
+            result = String.valueOf(fineTunePropsByName.get('id')); 
         }
         else{
-            system.debug('Error: ' + res.getStatus() + ' --- Code: '+res.getStatusCode());
+            result= 'Error: ' + res.getStatus() + '  -  Code: '+res.getStatusCode();
         }
 
-        return fineTuneId;
+        return result;
     }
 
-    public static void createModelRecord(String datasetId,String baseModel,String suffixName, String fineTuneId){
-        system.debug('FINE TUNE ID FOR CREATE MODEL RECORD: ' + fineTuneId);
+    public static String deleteFineTuneFromServer(List<String> fineTunesIds){
+            
+    }
+    public static void createModelRecord(String datasetId,String baseModel,String suffixName, String result){
+        system.debug('FINE TUNE ID FOR CREATE MODEL RECORD: ' + result);
         Model__c parentModel = new Model__c();
         try{
             parentModel = [SELECT Id FROM Model__c WHERE Name=:baseModel]; 
@@ -223,8 +265,8 @@ public with sharing class ModelService {
         catch(Exception e){
             parentModel = null;
         }
-        if(fineTuneId !=''){
-           Database.insert(new Model__c(Name= suffixName,Model_Id__c = fineTuneId,parentModel__c = parentModel?.Id,Dataset_Id__c = datasetId));
+        if(result !='' && !result.contains('Error')){
+           Database.insert(new Model__c(Name= suffixName,Model_Id__c = result,parentModel__c = parentModel?.Id,Dataset_Id__c = datasetId));
         }
     }
     public static String getFineTuneId(String fineTuneName){
@@ -232,7 +274,7 @@ public with sharing class ModelService {
         String method = 'GET';
         String body = '';
         Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+        HttpResponse res = Utils.apiCaller(endpoint,body,method);
     
         String fineTuneId = '';
         if(res.getStatusCode() == 200){
@@ -258,7 +300,7 @@ public with sharing class ModelService {
         String method = 'GET';
         String body = '';
         Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+        HttpResponse res = Utils.apiCaller(endpoint,body,method);
     
         List<String> fineTunes = new List<String>();
         if(res.getStatusCode() == 200){
@@ -286,7 +328,7 @@ public with sharing class ModelService {
         String method = 'GET';
         String body = '';
         Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+        HttpResponse res = Utils.apiCaller(endpoint,body,method);
     
         String modelNameId = '';
         if(res.getStatusCode() == 200){
@@ -307,7 +349,7 @@ public with sharing class ModelService {
         String method = 'GET';
         String body = '';
         Http http = new Http();
-        HttpResponse res = PromptService.apiCaller(endpoint,body,method, ACCESS_TOKEN);
+        HttpResponse res = Utils.apiCaller(endpoint,body,method);
 
         List<String> eventsMessages = new List<String>();
         if(res.getStatusCode() == 200){

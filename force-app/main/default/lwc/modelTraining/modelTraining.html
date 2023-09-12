@@ -2,7 +2,7 @@
     <lightning-card title="Model training (Step 2)" class="model-training">
         <div class="slds-m-around_medium">
             <p if:true={showNewModelAdded} style="color:green">New model added</p>
-            <p if:true={showNewModelAddedError} style="color:red">Error - Job Creation Daily limit reached</p>
+            <p if:true={showNewModelAddedError} style="color:red">{newModelAddedErrorMsg}</p>
             <lightning-combobox
                 label="Select base model"
                 value={selectedModel}
