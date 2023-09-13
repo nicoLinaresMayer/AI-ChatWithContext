@@ -4,7 +4,8 @@ public with sharing class FineTuningController {
     @AuraEnabled
     public static String createFineTune(String datasetId,String baseModel,String suffixName){
         String result  = ModelService.createFineTune(datasetId,baseModel,suffixName);
-        ModelService.createModelRecord(datasetId,baseModel,suffixName,result);
+        Dataset__c dataset = [SELECT Id,Id__c FROM Dataset__c WHERE Id__c=:datasetId LIMIT 1];
+        ModelService.createModelRecord(dataset,baseModel,suffixName,result);
         return result;
         
     }
@@ -39,8 +40,8 @@ public with sharing class FineTuningController {
     }
 
     @AuraEnabled
-    public static void saveExamples(String examplesJson, Id datasetId){
-        DatasetService.saveExamples(examplesJson, datasetId);
+    public static void saveExamples(String examplesJson,String deletedRows, Id datasetId){
+        DatasetService.saveExamples(examplesJson, deletedRows, datasetId);
     }
 
     @AuraEnabled

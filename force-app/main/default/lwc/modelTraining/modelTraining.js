@@ -32,10 +32,10 @@ export default class ModelTraining extends LightningElement {
 
     connectedCallback(){
         this.getModelsWrapper();
-        this.listDatasetFilesWrapper();
+        this.getDatasetsWrapper();
     }
 
-    listDatasetFilesWrapper(){
+    getDatasetsWrapper(){
         getDatasets().then((data)=>{
             console.log(JSON.parse(JSON.stringify(data)));
             this.datasetOptions = data.map(item => ({
@@ -110,7 +110,7 @@ export default class ModelTraining extends LightningElement {
 
      handleRefreshDatasetList(){
         console.log(JSON.stringify(this.datasetOptions));
-        this.listDatasetFilesWrapper();
+        this.getDatasetsWrapper();
      }
     //Utils
     generateUniqueId() {

@@ -13,7 +13,8 @@ export default class DatasetUpload extends LightningElement {
     isModalOpen= false;
     datasetIsSaved = true;
     // Datatable
-    rows;
+    rows = [];
+    deletedRows = [];
 
     //Loading, info & errors
     showRowsInfo = false;
@@ -60,7 +61,7 @@ export default class DatasetUpload extends LightningElement {
     }
     handleUploadFile(){
         console.log(JSON.stringify(this.rows));
-        if(this.rows.length>10){
+        if(this.rows.length<10){
             this.rowsInfoMessage = 'Add at least 10 entries';
             this.showRowsInfo = true;
             setTimeout(() => {
@@ -100,14 +101,20 @@ export default class DatasetUpload extends LightningElement {
     }
 
     handleSaveFile(){
+        const filteredRows = this.rows.filter(row => {
+            return !Object.values(row).some(value => typeof value === 'string' && value.trim() === '');
+          });
         let rows = JSON.stringify(this.rows);
-        saveExamples({examplesJson: rows, datasetId:this.selectedDataset}).then(()=>{
+        let deletedRows = JSON.stringify(this.deletedRows);
+        saveExamples({examplesJson: rows, deletedRows: deletedRows, datasetId:this.selectedDataset}).then(()=>{
             this.rowsInfoMessage = 'Saved';
                 this.showRowsInfo = true;
                 setTimeout(() => {
                     this.showRowsInfo = false;
-                }, 3000)
-            
+                }, 3000);
+            this.deletedRows = [];
+            //Borrar this.retrieveExamplesWrapper(), se usaba para corroborar la equivalencia de la tabla en memoria con la guardada en base de datos
+            this.retrieveExamplesWrapper();  
         }).catch(error=>{
             this.rowsInfoMessage = 'Error';
                 this.showRowsInfo = true;
@@ -123,12 +130,16 @@ export default class DatasetUpload extends LightningElement {
         let randomId = this.generateUniqueId();
         let newRow = {Id: randomId, SystemMsg: '' ,UserMsg: '',AssistantMsg:''};
         this.rows = [...this.rows, newRow];
-        console.log(JSON.parse(JSON.stringify(this.rows)))
     }
 
     deleteRow(event){
         if(this.rows.length> 1){
-            this.rows.splice(this.rows.findIndex(row => row.Id === event.target.dataset.rowid), 1);
+            let deletedRow = this.rows[this.rows.findIndex(row => row.Id === event.target.dataset.id)];
+            if(!deletedRow.Id.includes('row_')){
+                this.deletedRows = [...this.deletedRows, deletedRow];
+            };
+            
+            this.rows.splice(this.rows.findIndex(row => row.Id === event.target.dataset.id), 1);
             this.rows = [...this.rows];
         }
         else{

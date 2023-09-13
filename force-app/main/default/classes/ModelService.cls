@@ -24,10 +24,26 @@ public with sharing class ModelService {
         return result;
     }
 
-    public static String deleteFineTuneFromServer(List<String> fineTunesIds){
-        return 'Ok';     
+    @future(callout=true)
+    public static void deleteModelsFromServer(List<String> modelsIds){
+        String apiKey = Utils.getApiKey();
+        for(String modelId : modelsIds){
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint('https://api.openai.com/v1/models/'+modelId);
+            req.setMethod('DELETE');
+            req.setHeader('Authorization','Bearer '+apiKey );
+            req.setHeader('Content-Type', 'application/json; charset=UTF-8');
+            req.setTimeout(120000);
+            Http http = new Http();
+            HttpResponse res = http.send(req);
+            if (res.getStatusCode() == 200) {
+                System.debug('Model deleted');
+            } else {
+                throw new HttpException('Error code : '+res.getStatusCode());
+            }
+        }
     }
-    public static void createModelRecord(String datasetId,String baseModel,String suffixName, String result){
+    public static void createModelRecord(Dataset__c dataset,String baseModel,String suffixName, String result){
         system.debug('FINE TUNE ID FOR CREATE MODEL RECORD: ' + result);
         Model__c parentModel = new Model__c();
         try{
@@ -37,7 +53,7 @@ public with sharing class ModelService {
             parentModel = null;
         }
         if(result !='' && !result.contains('Error')){
-           Database.insert(new Model__c(Name= suffixName,Model_Id__c = result,parentModel__c = parentModel?.Id,Dataset_Id__c = datasetId));
+           Database.insert(new Model__c(Name= suffixName,Model_Id__c = result,parentModel__c = parentModel?.Id,Dataset__c = dataset.Id));
         }
     }
     public static String getFineTuneId(String fineTuneName){
@@ -91,7 +107,7 @@ public with sharing class ModelService {
     }
 
     public static List<Model__c> getModels(){
-        return [SELECT Id,Name,Model_Id__c,Dataset_id__c FROM Model__c];
+        return [SELECT Id,Name,Model_Id__c FROM Model__c];
     }
 
     public static String getModelNameById(String fineTuneId){

@@ -152,30 +152,48 @@ public with sharing class DatasetService {
         return examplesWrapped; 
     }
 
-    public static void saveExamples(String examplesJson, Id datasetId){
-        Map<Id,Example__c> examplesMap = new Map<Id,Example__c>([SELECT Id FROM Example__c]);
+    public static void saveExamples(String examplesJson,String deletedRows, Id datasetId){
+        deleteOldExamples(deletedRows);
+        Dataset__c dataset = [SELECT Id FROM Dataset__c WHERE Id =:datasetId];
+        Map<Id,Example__c> examplesMap = new Map<Id,Example__c>([SELECT Id FROM Example__c WHERE Dataset__c =: dataset.Id]);
         List<Object> objectList = (List<Object>)JSON.deserializeUntyped(examplesJson);
         List<Example__c> examplesToInsert = new List<Example__c>();
         List<Example__c> examplesToUpdate = new List<Example__c>();
         
         for(Object obj : objectList){
+            String newContent = JSON.serialize(obj);
             Map<String,Object> objectMap = (Map<String,Object>) obj;
             String exampleId = (String) objectMap.get('Id');
-            if(!exampleId.contains('row_') && examplesMap.containsKey(exampleId)){
-                Example__c record = examplesMap.get(exampleId);
-                record.Content__c = JSON.serialize(obj);
-                examplesToUpdate.add(record);
+            if(objectMap.get('AssitantMsg')!='' && objectMap.get('UserMsg')!='' && objectMap.get('SystemMsg')!=''){
+                if(!exampleId.contains('row_') && examplesMap.containsKey(exampleId)){
+                    Example__c record = examplesMap.get(exampleId);
+                    record.Content__c = newContent;
+                    examplesToUpdate.add(record);
+                }
+                else{
+                    system.debug('contains _row');
+                    examplesToInsert.add(new Example__c(Dataset__c = datasetId, Content__c = newContent));
+                }         
             }
-            else{
-                system.debug('contains _row');
-                examplesToInsert.add(new Example__c(Dataset__c = datasetId, Content__c = JSON.serialize(obj)));
-            }
-            
+                
+        }
+        if(!examplesToInsert.isEmpty()){
+            insert examplesToInsert;
+        }
+        if(!examplesToUpdate.isEmpty()){
+            update examplesToUpdate;
+        }
+    }
+
+    public static void deleteOldExamples(String deletedRows){
+        List<Object> objectList = (List<Object>)JSON.deserializeUntyped(deletedRows);
+        Set<Id> examplesIds = new Set<Id>();
+        for(Object obj : objectList){
+            Map<String,Object> objectMap = (Map<String,Object>) obj;
+            examplesIds.add((Id) objectMap.get('Id'));
         }
 
-        insert examplesToInsert;
-        update examplesToUpdate;
-        
+        delete [SELECT ID FROM Example__C WHERE Id IN :examplesIds];
     }
     @future(callout=true)
     public static void deleteDatasetsFromServer(List<String> datasetsIds){
