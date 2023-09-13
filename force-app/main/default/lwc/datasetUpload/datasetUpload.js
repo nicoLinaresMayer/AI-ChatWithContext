@@ -77,11 +77,8 @@ export default class DatasetUpload extends LightningElement {
             }
             else{
                 this.uploadFileIsLoading = true;
-                let stringArray = this.rows.map(row=>{
-                    return JSON.stringify(row);
-                });     
-                
-                uploadDatasetFile({rows: stringArray, datasetId: this.selectedDataset}).then(()=>{
+                    
+                uploadDatasetFile({datasetId: this.selectedDataset}).then(()=>{
                     this.rowsInfoMessage = 'Successfully upload file';
                     this.showRowsInfo = true;
                     this.uploadFileIsLoading = false;
@@ -103,9 +100,7 @@ export default class DatasetUpload extends LightningElement {
     }
 
     handleSaveFile(){
-        console.log(JSON.parse(JSON.stringify(this.rows)));
         let rows = JSON.stringify(this.rows);
-        console.log('rows->'+rows);
         saveExamples({examplesJson: rows, datasetId:this.selectedDataset}).then(()=>{
             this.rowsInfoMessage = 'Saved';
                 this.showRowsInfo = true;

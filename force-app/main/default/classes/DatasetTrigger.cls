@@ -4,6 +4,6 @@ public with sharing class DatasetTrigger {
         for(Dataset__c dataset: datasets){
             datasetsIds.add(dataset.Id__c);
         }
-        ModelService.deleteDatasetsFromServer(datasetsIds);
+        DatasetService.deleteDatasetsFromServer(datasetsIds);
     }
 }
