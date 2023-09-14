@@ -13,7 +13,7 @@ export default class DatasetUpload extends LightningElement {
     isModalOpen= false;
     datasetIsSaved = true;
     // Datatable
-    rows = [];
+    rows;
     deletedRows = [];
 
     //Loading, info & errors
@@ -143,6 +143,10 @@ export default class DatasetUpload extends LightningElement {
             this.rows = [...this.rows];
         }
         else{
+            let deletedRow = this.rows[this.rows.findIndex(row => row.Id === event.target.dataset.id)];
+            if(!deletedRow.Id.includes('row_')){
+                this.deletedRows = [...this.deletedRows, deletedRow];
+            };
             this.rows =[{UserMsg: '', SystemMsg: '',AssistantMsg:'', Id: this.generateUniqueId()}];
         }
         
