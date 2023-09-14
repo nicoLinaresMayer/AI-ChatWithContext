@@ -155,8 +155,9 @@
     <externalSharingModel>Private</externalSharingModel>
     <label>Example</label>
     <nameField>
+        <displayFormat>Ex-{00000}</displayFormat>
         <label>Name</label>
-        <type>Text</type>
+        <type>AutoNumber</type>
     </nameField>
     <pluralLabel>Examples</pluralLabel>
     <searchLayouts></searchLayouts>

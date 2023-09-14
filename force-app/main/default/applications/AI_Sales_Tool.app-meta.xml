@@ -22,6 +22,7 @@
     <tabs>Session__c</tabs>
     <tabs>Fine_Tune_Training</tabs>
     <tabs>Model__c</tabs>
+    <tabs>Dataset__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>AI_Sales_Tool_UtilityBar</utilityBar>
 </CustomApplication>
