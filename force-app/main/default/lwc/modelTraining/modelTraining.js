@@ -49,7 +49,7 @@ export default class ModelTraining extends LightningElement {
      // TRAIN MODEL
      handleTrainModel(){
          console.log('datasetId:'+this.selectedDataset + '  baseModel:'+ this.selectedModel + '  suffix:'+ this.newModelSuffix);
-         /*createFineTune({datasetId : this.selectedDataset , baseModel : this.selectedModel, suffixName : this.newModelSuffix}).then((result)=>{
+         createFineTune({datasetId : this.selectedDataset , baseModel : this.selectedModel, suffixName : this.newModelSuffix}).then((result)=>{
              if(result!='' && !result.includes('Error')){
                 this.getModelsWrapper();
                 this.showNewModelAdded = true;
@@ -69,7 +69,7 @@ export default class ModelTraining extends LightningElement {
              
          }).catch(error=>{
              console.log(error);
-         });*/
+         });
          
      }
      getModelsWrapper(){

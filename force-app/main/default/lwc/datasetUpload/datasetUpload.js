@@ -51,7 +51,8 @@ export default class DatasetUpload extends LightningElement {
         }
         catch(error){
             console.log('error->'+error);
-        }       
+        }  
+        this.datasetIsSaved = false;     
     }
 
     handleDatasetChange(event){
@@ -130,6 +131,7 @@ export default class DatasetUpload extends LightningElement {
         let randomId = this.generateUniqueId();
         let newRow = {Id: randomId, SystemMsg: '' ,UserMsg: '',AssistantMsg:''};
         this.rows = [...this.rows, newRow];
+        this.datasetIsSaved = false;
     }
 
     deleteRow(event){
@@ -149,7 +151,7 @@ export default class DatasetUpload extends LightningElement {
             };
             this.rows =[{UserMsg: '', SystemMsg: '',AssistantMsg:'', Id: this.generateUniqueId()}];
         }
-        
+        this.datasetIsSaved = false;
     }
 
     generateUniqueId() {
