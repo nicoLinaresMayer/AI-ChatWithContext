@@ -12,36 +12,36 @@
                                 <pre class="message-box system-box">
                                     {message.Response}
                                 </pre>
-                            </li>
-                            
+                            </li>    
                         </template>
                     </ul>
                 </template>
-                
-                
             </div>
-            <div>
-                <lightning-slider class="slider" label="Temperature" min="0" max="2" step="0.01" size="x-small" value={temperatureValue} onchange={handleSliderChange}></lightning-slider>
-                <lightning-helptext content="Lower values for temperature result in more consistent outputs, while higher values generate more diverse and creative results. Select a temperature value based on the desired trade-off between coherence and creativity"></lightning-helptext>
-            </div>
+            <lightning-accordion class="example-accordion" allow-multiple-sections-open onsectiontoggle={handleToggleSection} 
+            active-section-name={sectionName}>
+                <lightning-accordion-section name="AdvancedOptions" label="Advance options">
+                    <div>
+                        <lightning-slider class="slider" label="Temperature" min="0" max="2" step="0.01" size="x-small" value={temperatureValue} onchange={handleSliderChange}></lightning-slider>
+                        <lightning-helptext content="Lower values for temperature result in more consistent outputs, while higher values generate more diverse and creative results. Select a temperature value based on the desired trade-off between coherence and creativity"></lightning-helptext>
+                    </div>
+                </lightning-accordion-section>
+          
+        </lightning-accordion> 
             
-            <div class="slds-p-around_medium lgc-bg">
-                <lightning-textarea type="text" value ={prompt} label="Enter your prompt" placeholder="" onchange={handleInputChange}></lightning-textarea>
+            <div class="slds-p-around_medium lgc-bg containerInputPrompt" onkeypress={handleEnter}>
+                <lightning-textarea type="text" value ={prompt} label="Enter your prompt" placeholder="" onchange={handleInputChange} class="inputPrompt"></lightning-textarea>
+                <template if:false={responseIsLoading}>
+                    <lightning-button-icon icon-name="utility:enter"  alternative-text="Send prompt" title="Send prompt" onclick={handleButtonClick}></lightning-button-icon>
+                </template>  
             </div>
             <div style="display:flex">
                 <template if:true={responseIsLoading}>
                     <div style="position:relative;margin-left:35px">
                         <lightning-spinner size="small" alternative-text="Loading"></lightning-spinner>
-                    </div>
-                    
+                    </div> 
                 </template>
-                <template if:false={responseIsLoading}>
-                    <lightning-button label="Send Prompt" onclick={handleButtonClick}></lightning-button>
-                </template>
-               
-               
-            </div>
-            
+
+            </div> 
             <p>
                 {response}
             </p>

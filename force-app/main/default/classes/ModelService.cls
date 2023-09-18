@@ -43,7 +43,6 @@ public with sharing class ModelService {
 
         for(String modelFTid : modelsFTids){
             HttpRequest req = new HttpRequest();
-            //ft:gpt-3.5-turbo-0613:personal:newmoedl:7yjxUF5U
             req.setEndpoint('https://api.openai.com/v1/models/'+modelFTid);
             req.setMethod('DELETE');
             req.setHeader('Authorization','Bearer '+apiKey );
