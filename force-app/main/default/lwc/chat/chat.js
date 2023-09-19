@@ -31,7 +31,6 @@ export default class Chat extends LightningElement {
         
     }
 
-
     handleButtonClick(){
         this.responseIsLoading = true;
         console.log(this.prompt);
@@ -64,7 +63,7 @@ export default class Chat extends LightningElement {
     handleSliderChange(event){
         this.temperatureValue = event.target.value;
     }
-
+    
     handleEnter(event){
         if(event.keyCode == 13 && !event.shiftKey){
           this.handleButtonClick();

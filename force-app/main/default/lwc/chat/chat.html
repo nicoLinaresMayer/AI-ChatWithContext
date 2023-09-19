@@ -19,7 +19,7 @@
             </div>
             <lightning-accordion class="example-accordion" allow-multiple-sections-open onsectiontoggle={handleToggleSection} 
             active-section-name={sectionName}>
-                <lightning-accordion-section name="AdvancedOptions" label="Advance options">
+                <lightning-accordion-section name="AdvancedSettings" label="Advanced settings">
                     <div>
                         <lightning-slider class="slider" label="Temperature" min="0" max="2" step="0.01" size="x-small" value={temperatureValue} onchange={handleSliderChange}></lightning-slider>
                         <lightning-helptext content="Lower values for temperature result in more consistent outputs, while higher values generate more diverse and creative results. Select a temperature value based on the desired trade-off between coherence and creativity"></lightning-helptext>
