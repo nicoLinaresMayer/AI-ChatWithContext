@@ -48,11 +48,13 @@
 	</types>
 	<types>
 		<members>Dataset__c</members>
+		<members>Document__c</members>
 		<members>Example__c</members>
 		<members>Model__c</members>
 		<members>Open_Ai__c</members>
 		<members>Prompt__c</members>
 		<members>Session__c</members>
+		<members>WhitePaper__c</members>
 		<name>CustomObject</name>
 	</types>
 	<types>

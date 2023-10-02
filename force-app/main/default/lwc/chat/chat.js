@@ -11,6 +11,7 @@ export default class Chat extends LightningElement {
     messages = [];
     temperatureValue = 0.8;
     responseIsLoading = false;
+    lastResponse='';
 
     handleInputChange(event) {
         this.prompt = event.target.value;
@@ -42,6 +43,7 @@ export default class Chat extends LightningElement {
                 this.response = '';
                 this.messages = [...this.messages, newPrompt];
                 this.prompt = '';
+                this.lastResponse = result;
             }
             else{
                 this.response = 'Error - Please check the status of fine-tuned model'
@@ -73,5 +75,14 @@ export default class Chat extends LightningElement {
     handleToggleSection(event){
         console.log(event);
         this.sectionName = event.detail.openSections;
+    }
+
+    handleSendToDocument(){
+        this.lastResponse;
+        const evt = new CustomEvent('documentincoming',{
+            detail : this.lastResponse
+        });
+        this.dispatchEvent(evt);
+        console.log(this.lastResponse);
     }
 }

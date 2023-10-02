@@ -9,6 +9,7 @@ export default class SessionContainer extends LightningElement {
     selectedModel = 'gpt-3.5-turbo';
     selectedModelNameId = 'gpt-3.5-turbo';
     modelOptions= [];
+    lastResponse = '';
 
     connectedCallback(){
         getModels().then(data=>{
@@ -44,4 +45,8 @@ export default class SessionContainer extends LightningElement {
         console.log(this.selectedModelNameId);
     }
     
+    handleSendDocument(event){
+        console.log('console.log HandleSendDocument')
+        this.lastResponse = event.detail;
+    }
 }

@@ -1,7 +1,11 @@
 <template>
     <div class="container">
-        <c-chat-context class="chat-context" session-id={recordId} onsavecontext={handleSaveContext}></c-chat-context>
-        <c-chat class="chat" session-id={recordId} model={selectedModelNameId}></c-chat>
+        <div class="chat-context">
+            <c-chat-context  session-id={recordId} onsavecontext={handleSaveContext}></c-chat-context>
+            <c-document-container last-response={lastResponse}></c-document-container>
+        </div>
+       
+        <c-chat class="chat" session-id={recordId} model={selectedModelNameId} ondocumentincoming ={handleSendDocument}></c-chat>
        
         <div class="slds-m-around_medium combobox-container">
             <lightning-combobox

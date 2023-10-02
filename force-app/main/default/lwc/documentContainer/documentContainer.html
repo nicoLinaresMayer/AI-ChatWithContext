@@ -1,0 +1,27 @@
+<template>
+    <lightning-card title="Document actions">
+        <lightning-combobox
+                label="Select type of Document"
+                value={selectedType}
+                options={documentTypes}
+                onchange={handleTypeChange}>
+        </lightning-combobox>
+    <template if:true={selectedType}>
+        <lightning-combobox
+                label="Select Document"
+                value={selectedDocument}
+                options={documents}
+                onchange={handleDocumentChange}>
+        </lightning-combobox>
+    </template>
+    <template if:true={selectedDocument}>
+        <lightning-combobox
+                label="Select Section"
+                value={selectedSection}
+                options={sections}
+                onchange={handleSectionChange}>
+        </lightning-combobox>
+    </template>
+    <lightning-button variant="base" label="Update document w/ last response" onclick={handleUpdateDocument}></lightning-button>
+    </lightning-card>
+</template>
