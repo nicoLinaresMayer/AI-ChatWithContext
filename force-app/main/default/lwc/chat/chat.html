@@ -31,13 +31,10 @@
     
             <lightning-accordion class="example-accordion" allow-multiple-sections-open onsectiontoggle={handleToggleSection} 
                 active-section-name={sectionName}>
-                    <lightning-accordion-section name="DocumentActions" label="Document Actions" style="border:1px solid red">
+                    <lightning-accordion-section name="DocumentActions" label="Document Actions">
                         <div>
-                           <lightning-button variant="base" label="Send to document" onclick={handleSendToDocument}></lightning-button>
+                           <lightning-button variant="brand-outline" label="Send to document" onclick={handleSendToDocument}></lightning-button>
                         </div>
-                        <div>
-                            <lightning-button variant="base" label="Auto-generate document" onclick={handleSendToDocument}></lightning-button>
-                         </div>
                     </lightning-accordion-section>
               
             </lightning-accordion> 
