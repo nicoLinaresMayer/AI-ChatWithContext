@@ -1,7 +1,7 @@
 public with sharing class PromptService {
     static final String ACCESS_TOKEN = Utils.getApiKey();
     
-    public static String handleChatCompletionResponse(HttpResponse res,Id sessionId){
+    public static String handleChatCompletionResponse(HttpResponse res){
         String responseContent = '';
         if (res.getStatusCode() == 200) {
             Map<String,Object> responseBody = (Map<String,Object>) JSON.deserializeUntyped(res.getBody());
@@ -21,15 +21,14 @@ public with sharing class PromptService {
 
     public static String getRequestBodyWithNewPrompt(String incomingPrompt,Id sessionId, String model,Decimal temperature){
         incomingPrompt = parsePrompt(incomingPrompt);
-        List<Prompt__c> promptsList = SessionService.retrieveSessionPrompts(sessionId);
+        List<Prompt__c> sessionPromptsList = SessionService.retrieveSessionPrompts(sessionId);
         List<Prompt__c> contextPromptsList = SessionService.retrieveContextPrompts(sessionId);
-        system.debug('CONTEXT PROMPT LIST');
-        system.debug(contextPromptsList);
+
         List<String> messagesList = new List<String>();
         for (Prompt__c prompt : contextPromptsList) {
             messagesList.add('{"role": "system", "content": "'+parsePrompt(prompt.Content__c)+'"}');
         }
-        for (Prompt__c prompt : promptsList) {
+        for (Prompt__c prompt : sessionPromptsList) {
             messagesList.add('{"role": "user", "content": "'+parsePrompt(prompt.Content__c)+'"}');
             messagesList.add('{"role": "system", "content": "'+parsePrompt(prompt.response__c)+'"}');
         }
@@ -53,18 +52,9 @@ public with sharing class PromptService {
         system.debug('REQUEST BODY');
         system.debug(body);
         HttpResponse res = Utils.apiCaller(endpoint, body, method);
-        String promptResponse = handleChatCompletionResponse(res,sessionId);
-     
-        //If condition meets, Create Prompt record and increase last index
-        if(promptResponse != ''){
-            Session__c session= SessionService.getSession(sessionId);
-            insert new Prompt__c(Content__c = prompt , Response__c = promptResponse, Session__c = session.Id , Order__c = session.LastPromptIndex__c);
-            session.LastPromptIndex__c++;
-            update session;
-        }
-
-        
-        return promptResponse;
+        String completion = handleChatCompletionResponse(res);
+       
+        return completion;
     }
 
     public static String retrieveFineTunedModel(){
@@ -101,16 +91,7 @@ public with sharing class PromptService {
         String parsedPrompt = '';
         if(prompt!= null){
             parsedPrompt= prompt.replaceAll('\n', '\\\\n');
-            parsedPrompt= parsedPrompt.replaceAll('"', '\\\\"');
-            //parsedPrompt = parsedPrompt.replaceAll('(\'|\\")', '\\\\$1');
-            //Control characters
-            //parsedPrompt = parsedPrompt.replaceAll('[\\f]', '\\\\f');
-            //parsedPrompt = parsedPrompt.replaceAll('[\\n]', '\\\\n');
-            //parsedPrompt = parsedPrompt.replaceAll('[\\r]', '\\\\r');
-            //parsedPrompt = parsedPrompt.replaceAll('[\\t]', '\\\\t');
-            //non ASCII
-
-            
+            parsedPrompt= parsedPrompt.replaceAll('"', '\\\\"');       
         }
         return parsedPrompt;
     }

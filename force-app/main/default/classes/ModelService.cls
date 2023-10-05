@@ -27,23 +27,9 @@ public with sharing class ModelService {
     @future(callout=true)
     public static void deleteModelsFromServer(List<String> modelsIds){
         String apiKey = Utils.getApiKey();
-        //https://api.openai.com/v1/fine_tuning/jobs/ftjob-BoKZ2yiX8s2qEcnNzuYto6ok
-        //Retrieve related FineTuning jobs
-
-        List<String> modelsFTids = new List<String>();
-        List<HttpResponse> responsesList = new List<HttpResponse>();
         for(String modelId : modelsIds){
-            responsesList.add(Utils.apiCaller('https://api.openai.com/v1/fine_tuning/jobs/'+modelId, '', 'GET'));
-        }
-        for(HttpResponse response : responsesList){
-            Map<String,Object> responseMap=(Map<String,Object>)JSON.deserializeUntyped(response.getBody());
-            modelsFTids.add((String)responseMap.get('fine_tuned_model'));
-        }
-
-
-        for(String modelFTid : modelsFTids){
             HttpRequest req = new HttpRequest();
-            req.setEndpoint('https://api.openai.com/v1/models/'+modelFTid);
+            req.setEndpoint('https://api.openai.com/v1/models/'+modelId);
             req.setMethod('DELETE');
             req.setHeader('Authorization','Bearer '+apiKey );
             req.setHeader('Content-Type', 'application/json; charset=UTF-8');

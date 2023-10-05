@@ -13,7 +13,6 @@ export default class SessionContainer extends LightningElement {
 
     connectedCallback(){
         getModels().then(data=>{
-            console.log(JSON.stringify(data));
             this.modelOptions = data.map(item => ({
                 label: item.Name,
                 value: item.Model_Id__c
@@ -46,7 +45,6 @@ export default class SessionContainer extends LightningElement {
     }
     
     handleSendDocument(event){
-        console.log('console.log HandleSendDocument')
         this.lastResponse = event.detail;
     }
 }

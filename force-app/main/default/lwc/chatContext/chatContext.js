@@ -14,7 +14,6 @@ export default class ChatContext extends LightningElement {
                 this.contextPrompts = data.map(element=>{
                     return element.Content + '\n__-__\n';
                 }).join('');;
-                console.log(JSON.stringify(this.contextPrompts));
                 this.isLoading = false;
 
             } else if (error) {

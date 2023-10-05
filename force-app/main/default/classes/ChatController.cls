@@ -3,7 +3,9 @@ public with sharing class ChatController {
     // Retrieve chat & get new chat completion
     @AuraEnabled
     public static String getChatCompletion(String prompt, String model, Id sessionId,Decimal temperature){
-        return PromptService.getChatCompletion(prompt,model,sessionId,temperature);
+        String promptResponse = PromptService.getChatCompletion(prompt,model,sessionId,temperature);
+        SessionService.registerNewPromptWithReponse(prompt,promptResponse,sessionId);
+        return promptResponse;
     }
 
     @AuraEnabled(cacheable=true)
