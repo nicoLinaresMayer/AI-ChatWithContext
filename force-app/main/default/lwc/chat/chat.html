@@ -17,7 +17,6 @@
                     </ul>
                 </template>
             </div>
-            <div style="display:flex">
                 <lightning-accordion class="example-accordion" allow-multiple-sections-open onsectiontoggle={handleToggleSection} 
                 active-section-name={sectionName}>
                     <lightning-accordion-section name="AdvancedSettings" label="Advanced settings">
@@ -28,17 +27,6 @@
                     </lightning-accordion-section>
               
             </lightning-accordion> 
-    
-            <lightning-accordion class="example-accordion" allow-multiple-sections-open onsectiontoggle={handleToggleSection} 
-                active-section-name={sectionName}>
-                    <lightning-accordion-section name="DocumentActions" label="Document Actions">
-                        <div>
-                           <lightning-button variant="brand-outline" label="Send to document" onclick={handleSendToDocument}></lightning-button>
-                        </div>
-                    </lightning-accordion-section>
-              
-            </lightning-accordion> 
-            </div>
            
             
             <div class="slds-p-around_medium lgc-bg containerInputPrompt" onkeypress={handleEnter}>

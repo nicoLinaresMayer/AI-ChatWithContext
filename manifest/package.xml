@@ -63,8 +63,8 @@
 		<members>Model__c</members>
 		<members>Open_Ai__c</members>
 		<members>Prompt__c</members>
+		<members>Section__c</members>
 		<members>Session__c</members>
-		<members>WhitePaper__c</members>
 		<name>CustomObject</name>
 	</types>
 	<types>
@@ -88,7 +88,15 @@
 		<name>Layout</name>
 	</types>
 	<types>
-		<members>*</members>
+		<members>chat</members>
+		<members>chatContext</members>
+		<members>datasetCreationModal</members>
+		<members>datasetUpload</members>
+		<members>documentContainer</members>
+		<members>fineTunedTraining</members>
+		<members>modelStatusModal</members>
+		<members>modelTraining</members>
+		<members>sessionContainer</members>
 		<name>LightningComponentBundle</name>
 	</types>
 	<types>

@@ -44,6 +44,7 @@ export default class Chat extends LightningElement {
                 this.messages = [...this.messages, newPrompt];
                 this.prompt = '';
                 this.lastResponse = result;
+                this.sendLastResponseToDocument();
             }
             else{
                 this.response = 'Error - Please check the status of fine-tuned model'
@@ -77,7 +78,7 @@ export default class Chat extends LightningElement {
         this.sectionName = event.detail.openSections;
     }
 
-    handleSendToDocument(){
+    sendLastResponseToDocument(){
         this.lastResponse;
         const evt = new CustomEvent('documentincoming',{
             detail : this.lastResponse
