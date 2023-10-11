@@ -23,7 +23,7 @@ public with sharing class DocumentService {
         List<String> responses = new List<String>();
         // Itero sobre las secciones y pido una completion , tomando el contexto
         for(Section__c documentSection : documentSections){
-            String incomingPrompt =  'Can you write me a ' + documentSection.Name + 'for mentioned industry. Please don\'t include a '+documentSection.Name + ' word at the begin of response and don\'t include a conclusion';
+            String incomingPrompt =  'Can you write me a section called "' + documentSection.Name + '" for mentioned industry. Please don\'t include a '+documentSection.Name + ' word at the begin of response and don\'t include a conclusion';
             
             String completion = PromptService.getChatCompletion(incomingPrompt,model,sessionId,temperature);
             system.debug(completion);
