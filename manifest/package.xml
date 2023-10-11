@@ -35,6 +35,10 @@
 		<name>AuraDefinitionBundle</name>
 	</types>
 	<types>
+		<members>Sin_ttulo1</members>
+		<name>ContentAsset</name>
+	</types>
+	<types>
 		<members>AI_Sales_Tool</members>
 		<name>CustomApplication</name>
 	</types>
@@ -99,5 +103,5 @@
 		<members>*</members>
 		<name>StaticResource</name>
 	</types>
-	<version>55.0</version>
+	<version>58.0</version>
 </Package>
