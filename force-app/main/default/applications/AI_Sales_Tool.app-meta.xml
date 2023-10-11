@@ -10,6 +10,8 @@
     </actionOverrides>
     <brand>
         <headerColor>#0070D2</headerColor>
+        <logo>Sin_ttulo1</logo>
+        <logoVersion>1</logoVersion>
         <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
     </brand>
     <formFactors>Small</formFactors>
@@ -23,6 +25,7 @@
     <tabs>Fine_Tune_Training</tabs>
     <tabs>Model__c</tabs>
     <tabs>Dataset__c</tabs>
+    <tabs>Document__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>AI_Sales_Tool_UtilityBar</utilityBar>
 </CustomApplication>
