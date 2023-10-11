@@ -1,6 +1,6 @@
 import { LightningElement,api} from 'lwc';
-import getModels from '@salesforce/apex/ChatController.getModels';
-import getModelNameById from '@salesforce/apex/ChatController.getModelNameById';
+import getModels from '@salesforce/apex/FineTuningController.getModels';
+import getModelNameById from '@salesforce/apex/FineTuningController.getModelNameById';
 
 export default class SessionContainer extends LightningElement {
     
@@ -9,10 +9,10 @@ export default class SessionContainer extends LightningElement {
     selectedModel = 'gpt-3.5-turbo';
     selectedModelNameId = 'gpt-3.5-turbo';
     modelOptions= [];
+    lastResponse = '';
 
     connectedCallback(){
         getModels().then(data=>{
-            console.log(JSON.stringify(data));
             this.modelOptions = data.map(item => ({
                 label: item.Name,
                 value: item.Model_Id__c
@@ -44,4 +44,7 @@ export default class SessionContainer extends LightningElement {
         console.log(this.selectedModelNameId);
     }
     
+    handleSendDocument(event){
+        this.lastResponse = event.detail;
+    }
 }

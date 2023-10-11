@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<GlobalValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customValue>
+        <fullName>Deck</fullName>
+        <default>true</default>
+        <label>Deck</label>
+    </customValue>
+    <customValue>
+        <fullName>One Pager</fullName>
+        <default>false</default>
+        <label>One Pager</label>
+    </customValue>
+    <customValue>
+        <fullName>White Paper</fullName>
+        <default>false</default>
+        <label>White Paper</label>
+    </customValue>
+    <masterLabel>DocumentType</masterLabel>
+    <sorted>false</sorted>
+</GlobalValueSet>

@@ -92,4 +92,15 @@ public with sharing class SessionService {
         Session__c session = [SELECT Id,LastPromptIndex__c FROM Session__c WHERE Id =:sessionId];
         return session;
     } 
+
+    public static void registerNewPromptWithReponse(String prompt, String promptResponse, Id sessionId){
+        //If condition meets, Create Prompt record and increase last index
+        if(promptResponse != ''){
+            Session__c session= SessionService.getSession(sessionId);
+            insert new Prompt__c(Content__c = prompt , Response__c = promptResponse, Session__c = session.Id , Order__c = session.LastPromptIndex__c);
+            session.LastPromptIndex__c++;
+            update session;
+        }
+    }
+            
 }

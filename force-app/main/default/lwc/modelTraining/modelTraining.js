@@ -1,21 +1,22 @@
-import { LightningElement,wire,api} from 'lwc';
-import createFineTune from '@salesforce/apex/ChatController.createFineTune';
-import getModels from '@salesforce/apex/ChatController.getModels';
-import listDatasetFiles from '@salesforce/apex/ChatController.listDatasetFiles';
-import getModelEventMessages from '@salesforce/apex/ChatController.getFineTuneJobEventMessages';
+import { LightningElement} from 'lwc';
+import createFineTune from '@salesforce/apex/FineTuningController.createFineTune';
+import getModels from '@salesforce/apex/FineTuningController.getModels';
+import getDatasets from '@salesforce/apex/FineTuningController.getDatasets';
+import getModelEventMessages from '@salesforce/apex/FineTuningController.getFineTuneJobEventMessages';
 import modelStatusModal from 'c/modelStatusModal';
 
 
 export default class ModelTraining extends LightningElement {
      //Dataset options
      datasetOptions = '';
-     selectedDataset = '';
+     selectedDataset = {};
      // Model options
      modelOptions = '';
      selectedModel = 'gpt-3.5-turbo-0613';
      newModelSuffix = '';
      showNewModelAdded = false;
      showNewModelAddedError = false;
+     newModelAddedErrorMsg = '';
  
      handleModelChange(event) {
          this.selectedModel = event.detail.value;    
@@ -26,19 +27,20 @@ export default class ModelTraining extends LightningElement {
      }
  
      handleDatasetChange(event) {
-         this.selectedDataset = event.detail.value;
+        this.selectedDataset = event.detail.value
      }
 
     connectedCallback(){
         this.getModelsWrapper();
-        this.listDatasetFilesWrapper();
+        this.getDatasetsWrapper();
     }
 
-    listDatasetFilesWrapper(){
-        listDatasetFiles().then((data)=>{
+    getDatasetsWrapper(){
+        getDatasets().then((data)=>{
+            console.log(JSON.parse(JSON.stringify(data)));
             this.datasetOptions = data.map(item => ({
-                label: item,
-                value: item
+                label: item.Name,
+                value: item.Id__c
             }));
         }).catch(error=>{
             console.log(error)
@@ -46,9 +48,9 @@ export default class ModelTraining extends LightningElement {
     }
      // TRAIN MODEL
      handleTrainModel(){
-         console.log('datasetName:'+this.selectedDataset + '  baseModel:'+ this.selectedModel + '  suffix:'+ this.newModelSuffix);
-         createFineTune({datasetName : this.selectedDataset , baseModel : this.selectedModel, suffixName : this.newModelSuffix}).then((result)=>{
-             if(result!=''){
+         console.log('datasetId:'+this.selectedDataset + '  baseModel:'+ this.selectedModel + '  suffix:'+ this.newModelSuffix);
+         createFineTune({datasetId : this.selectedDataset , baseModel : this.selectedModel, suffixName : this.newModelSuffix}).then((result)=>{
+             if(result!='' && !result.includes('Error')){
                 this.getModelsWrapper();
                 this.showNewModelAdded = true;
                 setTimeout(() => {
@@ -56,9 +58,11 @@ export default class ModelTraining extends LightningElement {
                }, 3000)
              }
             else{
+                this.newModelAddedErrorMsg = result;
                 this.showNewModelAddedError = true
                 setTimeout(() => {
                     this.showNewModelAddedError = false;
+                    this.newModelAddedErrorMsg = '';
                 }, 7000)
             }
 
@@ -86,7 +90,7 @@ export default class ModelTraining extends LightningElement {
         await getModelEventMessages({fineTuneId : this.selectedModel}).then(result=>{
             this.resultMessages = result.map(item=>{
                 let isFinished = false;
-                if(item.includes('job successfully completed')){
+                if(item.includes('successfully completed')){
                     isFinished = true;
                     modelIsFinished = true;
                 }
@@ -105,7 +109,8 @@ export default class ModelTraining extends LightningElement {
      }
 
      handleRefreshDatasetList(){
-        this.listDatasetFilesWrapper();
+        console.log(JSON.stringify(this.datasetOptions));
+        this.getDatasetsWrapper();
      }
     //Utils
     generateUniqueId() {

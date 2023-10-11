@@ -12,9 +12,8 @@ export default class ChatContext extends LightningElement {
         try{
             if (data) {
                 this.contextPrompts = data.map(element=>{
-                    return element.Content + '\n';
+                    return element.Content + '\n__-__\n';
                 }).join('');;
-                console.log(JSON.stringify(this.contextPrompts));
                 this.isLoading = false;
 
             } else if (error) {
@@ -31,7 +30,7 @@ export default class ChatContext extends LightningElement {
         this.contextPrompts= event.target.value;
     }
     handleSave(){
-        let arrayContextPrompts = this.contextPrompts.split('\n');
+        let arrayContextPrompts = this.contextPrompts.split('\n__-__\n');
         console.log(JSON.stringify(arrayContextPrompts));
         saveContextPrompts({ sessionId: this.sessionId, contextPrompts: arrayContextPrompts })
             .then(() => {

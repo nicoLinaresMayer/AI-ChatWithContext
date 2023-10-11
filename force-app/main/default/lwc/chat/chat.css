@@ -38,3 +38,12 @@
 .slider{
     background:#b4b3b3;
 }
+
+.inputPrompt{
+    flex:1;
+    margin-right:10px;
+}
+.containerInputPrompt{
+    display:flex;
+    align-items: center;
+}
